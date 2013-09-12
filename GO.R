@@ -58,4 +58,5 @@ GO1 <-
     fit <- sapply(mods, function(z)
                   predict(z, newdata = list(x = grad), type = "response"))
     matplot(grad, fit, type="l", lty=1, ...)
+    rug(x)
 }
