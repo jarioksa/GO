@@ -54,8 +54,12 @@ GO1 <-
 ### the species optima and the Gaussian axis really are are
 ### correlated). May be tough.
 GO2 <-
-    function(comm, tot = max(comm), freqlim = 5, ...)
+    function(comm, k = 1, tot = max(comm), freqlim = 5, ...)
 {
+    ## Limit to k <= 4
+    if (k > 4)
+        stop(gettextf("Maximum allowed number of axes is 4, but you had k = %d",
+                      k))
     ## Remove rare species
     freq <- colSums(comm > 0)
     comm <- comm[, freq >= freqlim]
@@ -71,16 +75,17 @@ GO2 <-
     fam <- quasibinomial()
     ginv <- fam$linkinv
     dev <- fam$dev.resids
-    ## initialize gradient as first DCA axis
-    x <- scores(decorana(comm), display = "sites", choices = 1)
+    ## initialize gradient as DCA axes
+    x <- as.matrix(scores(decorana(comm), display = "sites", choices = 1:k))
     ## initial estimates for species (these are "final" with the
     ## current 'x')
-    mods <- lapply(comm, function(y) glm(cbind(y, tot-y) ~ x + offset(-0.5 * x^2),
+    mods <- lapply(comm, function(y) glm(cbind(y, tot-y) ~
+                                         x + offset(-0.5 * rowSums(x^2)),
                                          family = fam))
     b <- sapply(mods, coef)
     ## Pack parameters to a single vector
-    p <- c(x, b[1,], b[2,])
-    nn <- cumsum(c(nrow(comm), ncol(comm), ncol(comm)))
+    p <- c(as.vector(x), as.vector(t(b)))
+    nn <- cumsum(c(k*nrow(comm), ncol(comm), k*ncol(comm)))
     ## We need matrix response, and with quasibinomial, we need to
     ## divide with 'tot'
     if (length(tot) < nrow(comm))
@@ -91,20 +96,20 @@ GO2 <-
     ## deviances
     loss <- function(p, ...) {
         ## split params
-        x <- p[1 : nn[1]]
+        x <- matrix(p[1 : nn[1]], ncol=k)
         b0 <- p[(nn[1]+1) : nn[2]]
-        b1 <- p[(nn[2]+1) : nn[3]]
+        b1 <- matrix(p[(nn[2]+1) : nn[3]], nrow = k, byrow=TRUE)
         ## model lp = b0 -0.5*x^2 + b1*gr
-        lp <- outer(-0.5*x^2, b0, "+") + outer(x, b1, "*")
+        lp <- outer(-0.5*rowSums(x^2), b0, "+") + x %*% b1
         sum(dev(y, ginv(lp), wts))
     }
     out <- nlm(loss, p = p, ...)
-    out$axis <- out$estimate[1 : nn[1]]
-    out$species <- rbind(out$estimate[(nn[1]+1) : nn[2]],
-                         out$estimate[(nn[2]+1) : nn[3]])
+    out$k <- k
+    out$axis <- matrix(out$estimate[1 : nn[1]], ncol=k)
+    out$species <- matrix(out$estimate[(nn[1]+1) : nn[3]], nrow = k+1, byrow = TRUE)
     names(out$axis) <- rownames(comm)
     colnames(out$species) <- colnames(comm)
-    rownames(out$species) <- c("b0","b1")
+    rownames(out$species) <- paste0("b", 0:k)
     out$estimate <- NULL
     out$family <- fam
     class(out) <- "GO2"
