@@ -2,6 +2,8 @@
 
 \usepackage{vegan} % vegan settings
 \usepackage{subfigure}
+\usepackage{tikz} % used for Gaussian response pic
+\newcommand{\E}{\mathrm{e}} % used in the previous tikz pic
 
 \title{Gaussian Ordination} 
 \author{Jari Oksanen}
@@ -25,7 +27,24 @@ The Gaussian response model for a single species and a single gradient
 is defined as (Fig.~\ref{fig:gaussresp})
 \begin{figure}
   \centering
-  \includegraphics[width=0.6\linewidth]{gaussianresponse}
+  \begin{tikzpicture}[scale=1.2]
+    \begin{small}
+      \draw (-2.75,0) -- (3,0) node [near end,below]{Gradient $x$};
+      \draw (-2.75,0) -- (-2.75,3) node [near end,above,sloped]{Response $\mu$};
+      \draw[domain=-2.75:3,smooth,thick] plot (\x, {3*exp(-\x*\x/2)});
+      \draw (0,3) -- (0,0) node [near start,left]{$h$} node [below] {$u$};
+      \draw (0, {3*exp(-0.5)}) -- (1, {3*exp(-0.5)}) node [midway,above]{$t$};
+      \draw [dashed] (1, 0) -- (1, {exp(-0.5)*3});
+      \draw [dashed] (0, {exp(-0.5)*3}) -- (-1, {exp(-0.5)*3}) -- (-1,0) node [below] {$u-t$};
+      \draw [dashed] (2, 0) -- (2, {exp(-2)*3}) -- (0, {exp(-2)*3}) --
+      (-2, {exp(-2)*3}) -- (-2,0) node [below] {$u-2t$};
+      \draw (-2.75, 3) -- (-2.65,3) node[right] {$h$};
+      \draw (-2.75, {exp(-0.5)*3}) -- (-2.65,{exp(-0.5)*3}) node[right]
+      {$h \E^{-1/2}$};
+      \draw (-2.75, {exp(-2)*3}) -- (-2.65,{exp(-2)*3}) node [right]
+      {$h \E^{-2}$};
+    \end{small}
+  \end{tikzpicture}
   \caption{Gaussian response function of eq.~(\ref{eq:gauss}).}
   \label{fig:gaussresp}
 \end{figure}
@@ -156,6 +175,34 @@ choice. The Binomial model uses logit link function so that the models
 are not strictly Gaussian. Other error models to be inspected are
 quasi-Poisson and Normal (Gaussian distribution), both with $\log$
 link. 
+
+For effective evaluation, we need derivatives of the likelihood with
+respect to the parameters. If these are not supplied, numerical
+derivatives will be used, and for each parameter this means
+re-evaluation of the complete loss function. McCullagh and Nelder show
+that the general form of the derivate of likelihood function $l$ with
+respect to the parameter $p$ is
+\begin{align}
+  \frac{\partial l}{\partial p} &= \frac{\partial l}{\partial \theta}
+  \frac{d \theta}{d \mu} \frac{d \mu}{d \eta} \frac{\partial
+    \eta}{\partial p}\\
+  &= \frac{W (y-\mu)}{\VAR (\mu)} \frac{d \mu}{d \eta} \frac{\partial
+    \eta}{\partial p}\,,
+\end{align}
+where $W$ are prior weights, $y$ are observed values (possibly scaled
+by $W^{-1}$), $\mu$ are fitted values, and $\eta$ are the linear
+predictors, and $\theta$ is the parameter of the exponential family
+defining both fitted values and variances. The $\VAR (\mu$) and
+$\frac{d \mu}{d \eta}$ functions are supplied by \R{} as a part of
+defining the error distribution and link function. The partial
+derivatives of parameters with respect to linear predictor
+$\frac{\partial \eta}{\partial p}$ of eq.~(\ref{eq:gpoly}) are
+trivial:
+\begin{align}
+  \frac{\partial \eta}{\partial a} = 1\,, \quad
+  \frac{\partial \eta}{\partial b} = x \,,\quad
+  \frac{\partial \eta}{\partial x} = b-x \,.
+\end{align}
 
 \subsection{Testable models}
 
@@ -318,7 +365,7 @@ responses against gradients (Fig.~\ref{fig:plotm1}).
     defaults to a stacked line.}
   \label{fig:plotm1}
 \end{figure}
-<<plot-GO2,fig=true,include=false>>=
+<<plot-GO2,fig=TRUE,include=FALSE>>=
 plot(m1, label = TRUE)
 @ 
 For multi-axis models this will display a line through origin with
@@ -329,7 +376,7 @@ default is a gradient line through the origin.
 For a classical ordination plot, we can use \pkg{vegan}
 \code{ordiplot} function that is able to handle \code{GO2} results
 (Fig.~\ref{fig:plotm1}).
-<<ordiplot-stack,fig=true,include=false>>=
+<<ordiplot-stack,fig=TRUE,include=FALSE>>=
 ordiplot(m1)
 @ 
 Function \code{ordiplot} displays one-axis results with a
@@ -343,10 +390,10 @@ to show ordination plots of both species and sites (Fig.~\ref{fig:plotm2})
     optima and gradient positions of SUs. \textbf{b} Only SUs.}
   \label{fig:plotm2}
 \end{figure}
-<<ordiplot-m2a,fig=true,include=false>>=
+<<ordiplot-m2a,fig=TRUE,include=FALSE>>=
 ordiplot(m2, type="t")
 @ 
-<<ordiplot-m2b,fig=true,include=false>>=
+<<ordiplot-m2b,fig=TRUE,include=FALSE>>=
 ordiplot(m2, display="si")
 @
 
@@ -365,7 +412,7 @@ one-dimensional solution onto two-dimensional solution
     the one-dimensional ordination.}
   \label{fig:go-subspace}
 \end{figure}
-<<go-subspace,fig=true,include=false>>=
+<<go-subspace,fig=TRUE,include=FALSE>>=
 ordisurf(m2 ~ scores(m1), bubble=3)
 plot(envfit(m2 ~ scores(m1)), label="Dim1")
 @ 
@@ -382,7 +429,7 @@ approximate GO ML ordination\,--\,provided all species have $t=1$,
 equal heights and their optima ($u=b$) are evenly distributed along
 the gradients.  GO used only species with frequency of $\ge 10$ and we
 shall analyse the same subset.
-<<proc-dca,fig=true,include=false>>=
+<<proc-dca,fig=TRUE,include=FALSE>>=
 v10 <- varespec[, colSums(varespec>0) >= 10]
 ord <- decorana(v10)
 p1 <- procrustes(m2, ord, choices = 1:2)
@@ -402,7 +449,7 @@ The \pkg{vegan} \code{metaMDS} standardizes data by default, and this
 seems to have a large effect with these data. Therefore we turn off
 \code{autotransform} to analyse non-transformed data, but still use
 the default Bray-Curtis index.
-<<proc-nmds,fig=true,include=false>>=
+<<proc-nmds,fig=TRUE,include=FALSE>>=
 nm <- metaMDS(v10, autotransform = FALSE, trace = FALSE)
 p2 <- procrustes(m2, nm)
 p2
@@ -428,7 +475,7 @@ coefficient, and plot the results over the canonical fit
     responses.}
   \label{fig:freefit}
 \end{figure}
-<<freefit,fig=true,include=false>>=
+<<freefit,fig=TRUE,include=FALSE>>=
 ## take the same subset of species as used in GO2
 v10 <- varespec[, colSums(varespec>0) >= 10]
 ## the gradient
@@ -582,13 +629,13 @@ let us have a look at the problems:
   \caption{Gaussian Ordination of Dune Meadows.}
   \label{fig:dune}
 \end{figure}
-<<dune-resp,fig=true,include=false>>=
+<<dune-resp,fig=TRUE,include=FALSE>>=
 data(dune)
 mdu1 <- GO2(dune, k=1, iterlim=1000)
 mdu1
 plot(mdu1, label=TRUE)
 @ 
-<<dune-ordi,fig=true,include=false>>=
+<<dune-ordi,fig=TRUE,include=FALSE>>=
 ordiplot(mdu1)
 @ 
 The analysis did not converge, and the results are surprising
