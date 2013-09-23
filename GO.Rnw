@@ -1,0 +1,648 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage{vegan} % vegan settings
+\usepackage{subfigure}
+
+\title{Gaussian Ordination} 
+\author{Jari Oksanen}
+
+\begin{document}
+\SweaveOpts{strip.white=true}
+<<echo=false>>=
+par(mfrow=c(1,1))
+options(width=72)
+figset <- function() par(mar=c(4,4,1,1)+.1)
+options(SweaveHooks = list(fig = figset))
+options("prompt" = "> ", "continue" = "  ")
+@
+\maketitle
+
+\tableofcontents
+
+\section{Gaussian response model}
+
+The Gaussian response model for a single species and a single gradient
+is defined as (Fig.~\ref{fig:gaussresp})
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\linewidth]{gaussianresponse}
+  \caption{Gaussian response function of eq.~(\ref{eq:gauss}).}
+  \label{fig:gaussresp}
+\end{figure}
+\begin{equation}
+  \label{eq:gauss}
+  \mu_i = h \exp \left[-\frac{(x_i - u)^2}{2t^2}\right] \, ,
+\end{equation}
+where $\mu_i$ is the fitted value for SU $i$, $x_i$ is the gradient
+value, and $h$, $u$ and $t$ are the response parameters of the
+species: $h$ is the maximum height of the response, $u$ is the
+location of the optimum where $\mu = h$ is obtained, and $t$ is the
+width or tolerance of the response.
+
+The Gaussian response can be re-parametrized as a generalized linear
+model
+\begin{equation}
+  \label{eq:gpoly}
+  g(\mu_i) = a + b x_i + c x_i^2 \, ,
+\end{equation}
+which is equal to the Gaussian model of eq.~(\ref{eq:gauss}) if $c <
+0$.  In this model, $a$, $b$ and $c$ are species parameters and
+$g(\cdot)$ is a link function. For Gaussian response, the link
+function should be $g = \log$ so that the inverse link is $g^{-1} =
+\exp$. In practice, binomial models are normally fitted with logistic
+link function which does not strictly define a Gaussian response, but
+is still treated similary as $\log$ link.
+
+Polynomial form eq.~(\ref{eq:gpoly}) is a re-parametrization of the
+original Gaussian eq.~\ref{eq:gauss}, and the orginal Gaussian
+parameters can be found from the polynomial coefficients (provided
+that $c < 0$):
+\begin{align}
+  t &= \sqrt{-\frac{1}{2c}}\\
+  u &= -\frac{b}{2c} = b t^2\\
+  g(h) &= a -\frac{b^2}{4c} = a + 0.5 b^2 t^2\, .
+\end{align}
+
+If we scale $x$ ``in sd units'' so that $t = 1$ (and hence $c=-0.5$), 
+eq.~(\ref{eq:gpoly}) becomes
+\begin{equation}
+  \label{eq:gpolyfix}
+  g(\mu_i) = a + b x_i - 0.5 x_i^2 \, .
+\end{equation}
+With this scaling, $t=1$, $u = b$ and $g(h) = a + 0.5 b^2$. Curiously,
+the unimodal optima $u$ are expressed as linear coefficients
+$b$\,--\,something we discussed with Cajo ter Braak's new electronic
+paper on CA. In Cajo's paper that was approximate, but here the
+correspondence is exact since we defined that species have unit
+response widths $t=1$.
+
+\section{Gaussian Ordination}
+
+In usual model fitting with Gaussian responses, we regard gradient
+values $x_i$ as known, and estimate the species parameters so that
+fitted values $\mu_i$ are as similar to observed values $y_i$ as
+possible. In Maximum Likelihood estimation the fitted species
+parameters are estimated to maximize the likelihood of fitted values
+$\mu_i$ given data $y_i$ and $x_i$.  In Gaussian Ordination we 
+select $x_i$ and species parameters so that fitted values $\mu_i$ will
+maximize the likelihood function given data $y_i$ (and the model).
+
+We generalize eq.~\ref{eq:gpolyfix} with fixed $t=1$ for several
+species $j$ and several $k$ gradients:
+\begin{equation}
+  \label{eq:GO}
+  g(\mu_{ij}) = a_j - 0.5 \sum_k x_{ki}^2 + \sum_k b_{kj} x_{ki} \, .
+\end{equation}
+All terms ($a_j$, $b_{kj}$ and $x_{ki}$) are model parameters which
+are estimated to maximize the likelihood of fitted values $\mu_{ij}$
+given data $y_{ij}$.  The first terms $a_j$ define the scale or height
+for each species, second terms $-0.5 x_{ki}^2$ scale each gradient to
+unit tolerance, and the last terms $b_{kj} x_{ki}$ define the
+relationship between the species and the gradients. These last ones
+are the terms of interest: $b_{kj}$ are the locations of optima $u$
+for species on each gradient, and $x_{ki}$ are the gradient values.
+
+\subsection{Details of implementation}
+
+Equation~(\ref{eq:GO}) can be solved with non-linear minization of
+log-likelihood or deviance function. With a $n \times m$ data matrix
+and $k$ ordination dimensions, there are $m$ parameters $a$, $km$
+parameters $b$ and $kn$ parameters $x$ or altogether $m + k(m+n)$
+parameters which can be a large number. 
+
+There are two obvious alternative ways of estimating the model: 
+\begin{enumerate}
+\item Only ordination dimensions $x$ are found by non-linear
+  minimization, and the species parameters $a$ and $b$ are found
+  conditionally to the current iterate of $x$ using GLM. The
+  disadvantages of the strategy is that evaluation of the function is
+  very expensive, because full GLM iteration is performed for every
+  choice of $x$, and function may be evaluated hundreds of times in
+  every iteration step. Further, it may be that sometimes function is
+  trapped because species parameters adapt to the current estimates of
+  $x$ and prevent changing $x$. This is apparent as stopping because
+  steplength is too short. Analysis of a $24 \times 28$ data set used
+  below took nearly 400\,sec in a 1.6\,GHz laptop, but used only 23
+  iterations. 
+\item All parameters are found simultaneously with non-linear
+  minization. The most obvious disadvantage is that the non-linear
+  minimization problem can be huge. However, the same data set as
+  above took 33\,sec, although it needed 197 iterations. Large data
+  sets can be really slow: one case I studied was a subset of 127 most
+  common species in 398 SUs of the Mt.\,Field vegetation data whick in
+  2 dimensions gave $127 + 2 \times (127 + 398) = 1177$ estimated
+  parameters, and it took days to run this analysis in a 1.6\,GHz
+  laptop. 
+\end{enumerate}
+I have implemented both alternatives although the main development
+branch is based on the second alternative, and this paper only uses
+the second alternative. In tests, both approaches gave similar results
+for one dimension.
+
+Non-linear minimization needs starting values, and because problem is
+large, they should be rather good. I have used site scores of
+detrended correspondence analysis as a starting values for $x$, and
+coefficients of the corresponding GLM (eq.~\ref{eq:gpolyfix}) fit for
+species parameters $a$ and $b$. A commonly held conjecture is that if
+all species have Gaussian responses with equal tolerances, DCA should
+be able to estimate both the locations of species optima $u$ and
+gradient values $x$ related with them. I will add an option to supply
+own starting values for $x$.
+
+The target function to be minimized is the deviance of the model. The
+current version of the function uses quasi-Binomial deviance, but
+there will be other alternatives and this will be made a user
+choice. The Binomial model uses logit link function so that the models
+are not strictly Gaussian. Other error models to be inspected are
+quasi-Poisson and Normal (Gaussian distribution), both with $\log$
+link. 
+
+\subsection{Testable models}
+
+We have ML ordination and therefore we have all ML statistical tools
+available. Each model has deviance ($D$) which is a measure of badness
+of fit, and degrees of freedom of that fit. For instance, we can
+inspect two models with different number of extracted dimensions and
+see if the extra dimensions are significant. Let us inspect an
+alternative model with deviance $D_A$ and $k_A$ dimensions and a null
+model with deviance $D_0$ and $k_0$ dimensions, where $D_A \le D_0$
+and $k_A > k_0$. The significance of extra dimensions $k_A - k_0$ can
+be evaluated with $F$ statistic
+\begin{equation}
+  F_{(k_A-k_0)(m+n), mn - k_A(m+n) -m} =
+  \frac{(D_0-D_A)/\left[(k_A-k_0)(m+n)\right]}{D_A/(mn - k_A(m+n) -
+    m)} \, .
+\end{equation}
+A null model with no gradients ($k=0$) will only estimate $m$
+coefficients for the average of each species, and can be used as a
+baseline of model comparison. 
+
+Please note that the following does not define a meanigfully testable
+model:
+\begin{equation}
+  g(\mu_{ij}) = a_j - 0.5 \sum_k x_{ij}^2 \, .
+\end{equation}
+This defines a model where all species have their optima $u$ at the
+gradient origin $x = 0$, and superficially could be regarded as a test
+for an overall test that species have different optima $b$ when
+compared against eq.~(\ref{eq:GO}). However, the location of the
+origin $x = 0$ is arbitrary, and tests against an arbitrary value are
+meaningless. The default ANOVA-style tests for GLM would use this
+approach, and compare model with the the linear coefficient and fixed
+quadratic coefficients to a model with only the fixed quadratic
+coefficient.
+
+In principle it would be possible to get the estimates of standard
+errors of the parameters, but this is not done (yet). For this, we
+need to use log-likelihood as a minimized function instead of deviance
+(which has twice larger differences), and ask the minimizer function
+to return the Hessian or the matrix of the second derivatives. The
+estimates of the standard errors of the parameters are the square
+roots of inverse Hessian. These standard errors could be used to
+display the error variation ellipses of the ordination scores both for
+species and for SUs.
+
+\subsection{Constrained Gaussian Ordination}
+
+This is a work not yet done. However, the constrained version of
+GO looks pretty simple: Instead of freely estimating the gradients $x$
+in eq.~(\ref{eq:GO}), we estimate $x$ as a function of $p$
+constraining variables $z$
+\begin{equation}
+x_{ki} = \sum_p \beta_{kp} z_{ip} \,,
+\end{equation}
+and plug the estimated $x_{ki}$ into eq.~(\ref{eq:GO}).  This is
+actually an easier problem than unconstrained GO, because we only need
+to estimate $kp$ regression coefficients ($\beta$) instead of $kn$
+gradient values, and usually $p \ll n$.
+
+This will only give us strictly constrained scores $x$ comparable to
+linear combination (LC) scores in CCA and RDA. It may be possible to
+get related scores that are estimates from species composition, and
+hence comparable to WA scores in CCA/RDA. We reverse the model and
+ask what are the most likely values of $x$ giving the observed $y$ and
+the current model with fixed species parameters. This is the
+multivariate calibration or bioindication model that I suggested in
+JVS 1 in 1991. However, I am not sure that this work consistently:
+what would it give as $x$ if similarly applied in unconstrained GO?
+Consistent method should give the same $x$ as estimated originally,
+but I do not believe this will happen (but will try and see).
+
+\section{Examples}
+
+I use a current and always changing version of Gaussian Ordination in
+these examples and data sets and functions from \pkg{vegan} package.
+<<>>=
+library(vegan)
+source("GO.R")
+@ 
+The file \code{GO.R} contains main functions for analysis plus some
+support functions. All these are under work, and they will change, in
+particular in their internals, and even the user-interface is not yet
+stabilized. The two main analysis functions are \code{GO1} which
+implements alternate non-linear estimation of gradient values $x$ and
+GLM estimation of species parameters $a, b$. The user interfaces are:
+<<>>=
+args(GO1)
+args(GO2)
+@ 
+Both of these functions share some arguments:
+\begin{itemize}
+  \item \code{comm}: The community data frame.
+  \item \code{tot}: Binomial denominator.
+  \item \code{freqlim}: Frequency (number of occurrences) of rarest
+    species to be analysed. $k + 1$ parameters are fitted for
+    each species, and therefore we need some minimal data for
+    estimation. 
+\end{itemize}
+Function \code{GO1} is so far implemented only for one
+dimension. Because it uses the alternating non-linear and GLM fitting,
+it can use parallel processing in the evaluation (\code{parallel}
+gives the number of desired parallel processes). Function \code{GO2}
+can fit multidimensional models, and parameter \code{k} gives the
+number of axes. Currently \code{k} is limited to 4 axes, but there is
+no particularly compelling reason to impose this limit\,--\,I only
+assume that things get hairier as the number of axes increases. In
+addition, we can pass arguments to the minimizing function \code{nlm}
+in these functions, and we shall set higher iteration limits with
+\code{iterlim}. 
+
+\code{GO1} is currently only available for one dimension, and it is
+very slow, and therefore we use only \code{GO2}. Let us first evaluate
+models for one to three dimensions:
+<<>>=
+data(varespec)
+system.time(m1 <- GO2(varespec, k=1, freqlim=10, tot=100, iterlim=1000))
+system.time(m2 <- GO2(varespec, k=2, freqlim=10, tot=100, iterlim=1000))
+system.time(m3 <- GO2(varespec, k=3, freqlim=10, tot=100, iterlim=1000))
+@ 
+I have written some method functions that can be used with the result:
+<<>>=
+methods(class="GO2")
+@ 
+For instance, there is a \code{print} method so that we get a brief
+overview of the result (and typing the name of the object implicitly
+calls \code{print}):
+<<>>=
+m1
+m2
+m3
+@ 
+The \code{print} gives a brief overview of the result object, e.g.,
+the astonishingly high proportions of deviance explained by each
+ordination.  In fact, the result object contains a large number of
+components which are not displayed, but can be used by other
+functions:
+<<>>=
+names(m2)
+@ 
+The main results are SU scores (\code{points}, $x_{ik}$) and species scores
+(\code{species}, $b_{jk}$ which give the optima; the constants $a_j$
+are saved in item \code{b0}). The result object was constructed so that
+several standard \R{} functions can extract the results. Moreover,
+\pkg{vegan} function \code{scores} can extract species and site scores
+and many standard \pkg{vegan} functions can handle the result and we
+do not need to write new functions or interfaces; some examples we
+will see here are functions are \code{ordiplot}, \code{enfvit},
+\code{ordisurf}, \code{procrustes}. 
+
+I have made a specific \code{plot} function that displays the
+responses against gradients (Fig.~\ref{fig:plotm1}).
+\begin{figure}
+  \subfigure[a]{\includegraphics[width=0.5\linewidth]{GO-plot-GO2}}%
+  \subfigure[b]{\includegraphics[width=0.5\linewidth]{GO-ordiplot-stack}}
+  \caption{One-dimensional Gaussian Ordination. \textbf{a} Dedicated
+    \code{plot} function of \code{GO2} showing fitted Gaussian
+    responses against the gradient. \textbf{b} Standard \pkg{vegan}
+    ordination plot (\code{ordiplot}) which for one-axis models
+    defaults to a stacked line.}
+  \label{fig:plotm1}
+\end{figure}
+<<plot-GO2,fig=true,include=false>>=
+plot(m1, label = TRUE)
+@ 
+For multi-axis models this will display a line through origin with
+other gradients set to zero. It can optionally show the marginal model where
+the height of the curve would be the same on all gradients, but the
+default is a gradient line through the origin. 
+
+For a classical ordination plot, we can use \pkg{vegan}
+\code{ordiplot} function that is able to handle \code{GO2} results
+(Fig.~\ref{fig:plotm1}).
+<<ordiplot-stack,fig=true,include=false>>=
+ordiplot(m1)
+@ 
+Function \code{ordiplot} displays one-axis results with a
+\pkg{vegan} \code{linestack} function. With more axes, the default is
+to show ordination plots of both species and sites (Fig.~\ref{fig:plotm2})
+\begin{figure}
+  \centering
+  \subfigure[]{\includegraphics[width=0.5\linewidth]{GO-ordiplot-m2a}}%
+  \subfigure[]{\includegraphics[width=0.5\linewidth]{GO-ordiplot-m2b}}
+  \caption{Two-dimensional Gaussian Ordination. \textbf{a} Species
+    optima and gradient positions of SUs. \textbf{b} Only SUs.}
+  \label{fig:plotm2}
+\end{figure}
+<<ordiplot-m2a,fig=true,include=false>>=
+ordiplot(m2, type="t")
+@ 
+<<ordiplot-m2b,fig=true,include=false>>=
+ordiplot(m2, display="si")
+@
+
+Low-dimensional solution is not a subspace in higher dimensions. We
+cannot add new dimensions to  existing solutions, but ordination for
+each dimensionality must be found separately. In this respect GO and
+NMDS are similar. We can see this by fitting surface of
+one-dimensional solution onto two-dimensional solution
+(Fig.~\ref{fig:go-subspace}). 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\linewidth]{GO-go-subspace}
+  \caption{One-dimensional Gaussian Ordination axis fitted to a
+    two-dimensional solution as a smooth surface and as a vector
+    arrow. The diameter of SU circles is proportional to the scores on
+    the one-dimensional ordination.}
+  \label{fig:go-subspace}
+\end{figure}
+<<go-subspace,fig=true,include=false>>=
+ordisurf(m2 ~ scores(m1), bubble=3)
+plot(envfit(m2 ~ scores(m1)), label="Dim1")
+@ 
+As you see, \pkg{vegan} functions \code{ordisurf}, \code{envfit}
+and \code{scores} are can handle \code{GO2} results.
+
+\subsection{Other methods}
+
+I will not launch any large scale comparison nor simulations. However,
+it may be good to peek how GO results compare with other methods: are
+they more or less similar or something completely different. I have
+used DCA solution as the initial values, and it has been claimed to
+approximate GO ML ordination\,--\,provided all species have $t=1$,
+equal heights and their optima ($u=b$) are evenly distributed along
+the gradients.  GO used only species with frequency of $\ge 10$ and we
+shall analyse the same subset.
+<<proc-dca,fig=true,include=false>>=
+v10 <- varespec[, colSums(varespec>0) >= 10]
+ord <- decorana(v10)
+p1 <- procrustes(m2, ord, choices = 1:2)
+p1
+plot(p1, to.target = FALSE, main="")
+@ 
+\begin{figure}
+  \centering
+  \subfigure[DCA]{\includegraphics[width=0.5\textwidth]{GO-proc-dca}}%
+  \subfigure[NMDS]{\includegraphics[width=0.5\textwidth]{GO-proc-nmds}}
+  \caption{Procrustes rotation of 2-dimension Gaussian ordination
+    (dots) vs (\textbf{a}) Detrended Correspondence Analysis and
+    (\textbf{b}) Nonmetric Multidimensional Scaling (arrow heads).  }
+  \label{fig:proc-GO}
+\end{figure}
+The \pkg{vegan} \code{metaMDS} standardizes data by default, and this
+seems to have a large effect with these data. Therefore we turn off
+\code{autotransform} to analyse non-transformed data, but still use
+the default Bray-Curtis index.
+<<proc-nmds,fig=true,include=false>>=
+nm <- metaMDS(v10, autotransform = FALSE, trace = FALSE)
+p2 <- procrustes(m2, nm)
+p2
+plot(p2, to.target=FALSE, main="")
+@ 
+The goodness of fit is measured in the units of the target, and the
+analyses are comparable. NMDS is clearly much more similar to GO than
+DCA, although DCA was used as the starting configuration in GO.
+
+\subsection{Fixed tolerance and free shapes}
+
+I defined the species richnesses to have strictly equal tolerances
+$t=1$. This does not mean that such responses really are the best ones
+for the gradient. In the following we fit similar second degree
+polynomials to all species without restricting the second degree
+coefficient, and plot the results over the canonical fit
+(Fig.~\ref{fig:freefit}): 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{GO-freefit}
+  \caption{Gaussian ordination axis with species fitted with $t=1$
+    (solid lines) and allowing freely varying $t$ or even non-unimodal
+    responses.}
+  \label{fig:freefit}
+\end{figure}
+<<freefit,fig=true,include=false>>=
+## take the same subset of species as used in GO2
+v10 <- varespec[, colSums(varespec>0) >= 10]
+## the gradient
+ax <- drop(scores(m1))
+## fit free quadratic quasibinomial GLMs
+mods <- lapply(v10, function(y) glm(cbind(y, 100-y) ~ ax + I(ax^2), 
+                                    family=quasibinomial))
+## predict values
+predx <- seq(min(ax), max(ax), len=101)
+fits <- sapply(mods, function(z) predict(z, type="response", 
+                                         newdata=data.frame(ax=predx)))
+## plot
+plot(m1)
+matlines(predx, fits, lty=3)
+legend("topright", c("Fit with t=1", "Fit with free t"), lty=c(1,3), col=3)
+@ 
+The widths of Gaussian responses differ from $t=1$ although this was
+imposed in fitting:
+<<>>=
+b <- sapply(mods, coef)
+rownames(b)
+sqrt(-1/2/b[3,])
+@ 
+The \code{NaN} cases had quadratic coefficient\;$>0$ which define a
+non-unimodal response. Surprisingly, even \code{Cla.ste} is among
+those non-unimodal species, although chapter~\ref{sec:contributions}
+will show it to be most important driver of the ordination axis.  It
+seems that it would like to shoot up even more strongly than the
+restricted Gaussian allows.  Even with unimodal species, the best
+fitting widths deviate from theoretical (and fitted) $t=1$. The
+difference is significant, although only barely so compared to
+astronomically low values in all other test (see
+chapter~\ref{sec:tests}):
+<<>>=
+devalt <- sum(sapply(mods, deviance))
+devalt
+deviance(m1)
+## we have 28 species
+dff <- 28
+dfr <- df.residual(m1)-dff
+scl <- deviance(m1)/dfr
+f <- (deviance(m1) - devalt)/dff/scl
+f
+pf(f, dff, dfr, lower.tail = FALSE)
+@ 
+
+
+
+\subsection{Tests}
+\label{sec:tests}
+
+We fit ML models which are special cases of GLM, and therefore we can
+perform all typical tests. I have packed basic ANOVA as a separate
+function. An overall test of the fitted model is
+<<>>=
+anova(m2)
+@ 
+The significances are very high (that is, $P$-values are low).  The
+degrees of freedom take into account that the gradient also is
+estimated, but the tests still are biased. We have selected $x$ to
+minimize residual deviance and maximize $F$ statistics. I do not know
+yet how to develop more correct tests. Simple permutation is out of
+question due to slow calculation times. 
+
+The above tests gave the overall statistic for the whole
+multidimensional model. The packaged \code{anova} function allows
+testing a sequence of models for their difference. Comparison of
+\code{m2} against \code{m1} tests the significance of adding second
+axis to a one-axis model. Let us first see the significance of
+one-dimensional ordination:
+<<>>=
+anova(m1)
+@ 
+Then we can see how adding dimensions improves the results:
+<<>>=
+anova(m1, m2, m3)
+@ 
+
+\subsection{Contributions by species}
+\label{sec:contributions}
+
+This chapter is for those who complain that ordination tells us
+nothing about species. 
+
+The deviance of the model is the sum of deviances of individual
+species. This test is even more approximate than previous since we
+cannot take into account that the gradient $x$ was estimated to
+minimize the sum of deviances over all species. The degrees of freedom
+are based only on species parameters\footnote{I could take the
+  residual d.f. per species from a residual d.f. of the complete model
+  divided by the number of species so that the estimation of row
+  parameters $x$ would be divided evenly over species. This would
+  reduce $F$ statistics and number of d.f. and move tests to more
+  correct direction. The implemenation of $F$ distribution in \R{}
+  accepts decimal d.f.}  The canned test procedure for species is
+called \code{spanodev} (I know, this is an ugly name). It can be
+called with one model and in that case the overall model is compared
+against the null model. Alternatively, the function can be called with
+two models (but not with more models), and then these are compared
+against each other.
+
+Let us see first how one dimension ``explains'' each species:
+<<>>=
+spanodev(m1)
+@ 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\linewidth]{DSCN1123.jpg}
+  \caption{\emph{Cladina stellaris}, the most influential species in the ordination example.}
+  \label{fig:Claste}
+\end{figure}
+It is remarkable how unevenly species contribute to the model fit, and
+some species are actually more poorly explained by the model than the
+Null of constant abundance. One single species (\code{Cla.ste},
+\emph{Cladina stellaris}, Fig.~\ref{fig:Claste}) contributes more than
+half of the modelled deviance.  The situation is similar as in
+non-scaled PCA where species with large variance are the only worth
+explaining. Some weight equalizing trick should be developed. However,
+\emph{Cladina stellaris} is an important species and probably also a
+keystone species which many other species depend on. Moreover, the
+major external driver in these data is reindeer grazing which reduces
+the \emph{C. stellaris} cover drastically. We cannot say that method
+fails if it picks up this species.
+
+Then we can see how adding second axis improves fits for each species:
+<<>>=
+spanodev(m1, m2)
+@ 
+Adding second axis picks up new important species. The explanation for
+\emph{Cladina stellaris} does not improve: all was explained in the
+first axis. 
+
+\subsection{Failures}
+
+Even with limited tests, I have found cases where Gaussian Ordination
+seems to fail. Sometimes it fails in an informative way, sometimes
+mysteriously.  We fit a Gaussian response model to the data, and
+if that model is not appropriate, ordination should fail.
+
+One such failure case are the classic Duch Dune Meadows. Actually, one
+reason why I dropped developing Gaussian Ordination years ago was that
+I used Dune Meadows as a test case, and regarded its failure as a
+failure of the method. That also explains some arbitrary choices I
+made with the current draft version: fixing tolerances to unit scale,
+and starting with Binomial models with a ceiling to a response. But
+let us have a look at the problems:
+\begin{figure}
+  \centering
+  \subfigure[]{\includegraphics[width=0.5\textwidth]{GO-dune-resp}}%
+  \subfigure[]{\includegraphics[width=0.5\textwidth]{GO-dune-ordi}}
+  \caption{Gaussian Ordination of Dune Meadows.}
+  \label{fig:dune}
+\end{figure}
+<<dune-resp,fig=true,include=false>>=
+data(dune)
+mdu1 <- GO2(dune, k=1, iterlim=1000)
+mdu1
+plot(mdu1, label=TRUE)
+@ 
+<<dune-ordi,fig=true,include=false>>=
+ordiplot(mdu1)
+@ 
+The analysis did not converge, and the results are surprising
+(Fig.~\ref{fig:dune}). SUs are polarized in two groups very far away
+from each other.  It seems that GO
+thinks that there really is no continuous gradient. Most species have
+their optima in the empty middle region of the axis, and species are
+almost sure to occur in SUs that do not exist, since all SUs are
+somewhere else than the species optima (Fig.~\ref{fig:dune}). There is
+no penalty of fitting any values for areas with no data. The problem
+was the same in earlier implementation years ago when I used
+quasi-Poisson models that shot up to the sky. I now switched to
+quasi-Binomial to avoid this, but it had no effect. The fit is
+evaluated at data points, and if there are no points, you can do
+anything with no penalty. I have feeling that most species are
+ubiquitous, but there is one species of dry patches
+(\emph{Anthoxanthum odoratum}), and some species of wet patches
+(\emph{Agrostis stolonifera}, \emph{Juncus articulatus},
+\emph{Ranunculus flammula}, \emph{Eleocharis palustris}). I used the
+term ``patches'' because it may be that whole plot is not dry or wet,
+but it has a dry (hummock) or a wet (depression) patch in addition to
+normal flat ground with its ubiquitous species.
+
+I think Dune Meadows deserves to fail, and a method should fail if its
+strict assumptions are not appropriate. Preferably it should fail
+loudly, which was not the case now. Naturally, such a method is not
+robust, but should ML GO be robust? Isn't it Maximum Likelihood? Isn't
+it Gaussian? If data are not such, no ML GO should work\dots However,
+there is another case which seems to fail, and this is more
+problematic since here the method should have worked: GO of
+Mt.\,Field. 
+
+I intended to send you brief overview of my experiments last Sunday,
+but then light mindedly decided to also run a GO2 on the full
+Mt.\,Field data set: all 398\,SUs, but only 127 most common species
+(frequency\,$\ge 10$). My 1.6\,GHz laptop finished the analysis on
+Tuesday evening, and I  closed the lid only when we drove from
+Tuusniemi to Oulu and when I rode to job on my bicycle. It took well
+over 50\,hrs, and then it ended in a local optimum after
+952\;iterations. I had expected a clean result, but it looks strange
+(Fig.~\ref{fig:mtf-nmds}).
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{go2mtf}
+  \caption{Two-dimensionsl Gaussian Ordination of the Mt.\,Field data.}
+  \label{fig:mtf-nmds}
+\end{figure}
+Fitted vectors look OK: Altitude $R^2 = 0.8427$ vs. $R^2 = 0.8336$ and
+Drainage $R^2 = 0.7579$ vs. $R^2=0.7610$ in NMDS with the same subset
+of species. Moreover, Procrustes analysis hints that this has changed
+from the starting configuration of DCA, since Procrustes errors are
+smaller against NMDS than DCA. However, there are these strange
+straight lines that close the points in a kind of convex polygon which
+indicates that there is something fishy in the result. I do not know
+what that could be, but it does not smell success.
+
+\end{document}
