@@ -273,3 +273,30 @@ GO2 <-
     head <- gettextf("F statistics based on (%d, %.1f) degrees of freedom", ddf, dfr)
     structure(table, heading = head, class = c("anova", "data.frame"))
 }
+
+## Function normalizes SU scores so that (unweighted) average
+## tolerance = 1 for all species with unimodal responses and then
+## estimates the glm parameters for normalized SU scores.
+`GOnormalize` <-
+    function(comm, p, k, tot, family, ...)
+{
+    ## extract SU scores from parameters p. When this function is
+    ## evaluated for the first time, there are only these scores, but
+    ## at later evaluation, there will be species parameters which
+    ## will be ignored.
+    n <- nrow(comm)
+    x <- matrix(p[1: (k*n)], nrow=n, ncol=k)
+    ## fit Gaussian response with free parameters
+    b <- sapply(comm, function(y)
+                coef(glm(cbind(y, tot-y) ~ x + I(x^2), family = family)))
+    ## keep only negative 2nd degree coefficients
+    b <- b[-(1:(k+1)),]
+    b[b >= 0] <- NA
+    scl <- rowMeans(sqrt(-1/2/b), na.rm=TRUE)
+    x <- sweep(x, 2, scl, "/")
+    ## fit Gaussian response with fixed tol=1
+    b <- sapply(comm, function(y)
+                coef(glm(cbind(y, tot-y) ~ x + offset(-0.5 * rowSums(x^2)),
+                         family = family)))
+    c(as.vector(x), as.vector(t(b)))
+}
