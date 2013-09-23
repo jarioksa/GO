@@ -83,6 +83,9 @@ GO2 <-
                                          x + offset(-0.5 * rowSums(x^2)),
                                          family = fam))
     b <- sapply(mods, coef)
+    null.spdev <- sapply(lapply(comm, function(y) glm(cbind(y, tot-y) ~ 1,
+           family= fam)), function(z) z$deviance)
+    null.deviance <- sum(null.spdev)
     ## Pack parameters to a single vector
     p <- c(as.vector(x), as.vector(t(b)))
     nn <- cumsum(c(k*nrow(comm), ncol(comm), k*ncol(comm)))
@@ -103,17 +106,52 @@ GO2 <-
         lp <- outer(-0.5*rowSums(x^2), b0, "+") + x %*% b1
         sum(dev(y, ginv(lp), wts))
     }
-    out <- nlm(loss, p = p, ...)
-    out$k <- k
-    out$axis <- matrix(out$estimate[1 : nn[1]], ncol=k)
-    out$species <- matrix(out$estimate[(nn[1]+1) : nn[3]], nrow = k+1, byrow = TRUE)
-    names(out$axis) <- rownames(comm)
-    colnames(out$species) <- colnames(comm)
-    rownames(out$species) <- paste0("b", 0:k)
-    out$estimate <- NULL
+    mod <- nlm(loss, p = p, ...)
+    out <- list(deviance = mod$minimum, null.deviance = null.deviance,
+                k = k, iterations = mod$iterations, code = mod$code,
+                rank = length(mod$gradient),
+                df.residual = prod(dim(comm)) - length(mod$gradient),
+                df.null = prod(dim(comm)) - ncol(comm))
+    out$points <- matrix(mod$estimate[1 : nn[1]], ncol=k)
+    specpara <- t(matrix(mod$estimate[(nn[1]+1) : nn[3]], nrow = k+1, byrow = TRUE))
+    out$species <- specpara[,-1, drop=FALSE]
+    out$b0 <- specpara[,1, drop=FALSE]
+    out$fitted <- ginv(outer(-0.5*rowSums(out$points^2), drop(out$b0), "+") +
+        out$points %*% t(out$species))
+    out$spdev <- colSums(dev(y, out$fitted, wts))
+    out$null.spdev <- null.spdev
+    rownames(out$points) <- rownames(comm)
+    rownames(out$species) <- colnames(comm)
+    colnames(out$species) <- paste0("b", 1:k)
     out$family <- fam
+    out$call <- match.call()
     class(out) <- "GO2"
     out
+}
+
+`print.GO2` <-
+    function(x, digits = max(3, getOption("digits") - 3), ...)
+{
+    cat(gettextf(ngettext(x$k, "Gaussian Ordination with %d dimension\n",
+                 "Gaussian Ordination with %d dimensions\n"), x$k))
+    writeLines(strwrap(pasteCall(x$call)))
+    cat("\n")
+    cat(gettextf("%d iterations ", x$iterations))
+    cat(switch(x$code,
+               "(converged)",
+               "(iterates within tolerance, probably converged)",
+               "(step failed, perhaps a local minimum)",
+               "(too many iterations)",
+               "(convergence failed)"), "\n\n")
+    devs <- c(x$null.deviance, x$null.deviance - x$deviance, x$deviance)
+    props <- c(NA, devs[2:3]/devs[1])
+    dfs <- c(x$df.null, x$df.null - x$df.residual, x$df.residual)
+    table <- cbind(devs, props, dfs)
+    rownames(table) <- c("Null", "Model", "Residual")
+    colnames(table) <- c("Deviance", "Proportion","Df")
+    cat("Family", x$family$family, "\n")
+    printCoefmat(table, digits = digits, na.print="", zap.ind=c(1,2))
+    invisible(x)
 }
 
 `plot.GO1` <-
@@ -133,13 +171,105 @@ GO2 <-
 }
 
 `plot.GO2` <-
-    function(mod, ...)
+    function(mod, choices = 1, label = FALSE, marginal = FALSE,
+             cex=0.7, ...)
 {
-    x <- mod$axis
+    x <- scores(mod, choices = choices, type="sites")
     ginv <- mod$family$linkinv
     grad <- seq(min(x), max(x), len=101)
-    fit <- ginv(outer(-0.5 * grad^2, mod$species[1,], "+") +
-                outer(grad, mod$species[2,], "*"))
+    top <- drop(mod$b0)
+    if (marginal)
+        top <- top + 0.5 * rowSums(mod$species^2)
+    fit <- ginv(outer(-0.5 * grad^2, top, "+") +
+                outer(grad, mod$species[,choices], "*"))
     matplot(grad, fit, type = "l", lty=1, ...)
     rug(x)
+    if (label) {
+        br <- eval(formals(matplot)$col)
+        xlab <- grad[apply(fit, 2, which.max)]
+        ylab <- apply(fit, 2, max)
+        ordilabel(cbind(xlab, ylab), cex = cex, border = br, col=1, ...)
+    }
+}
+
+
+## Basic anova against Null model of constant response
+`anova.GO2` <-
+    function(object, ...)
+{
+    ## Check first if this should go to anova.GO2list
+    dotargs <- list(...)
+    if (length(dotargs)) {
+        isGO2 <- sapply(dotargs, function(z) inherits(z, "GO2"))
+        dotargs <- dotargs[isGO2]
+        if (length(dotargs))
+            return(anova.GO2list(c(list(object), dotargs)))
+    }
+    Df <- object$df.null - object$df.residual
+    Dev <- object$null.deviance - object$deviance
+    Fstat <- Dev/Df/(object$deviance/object$df.residual)
+    pval <- pf(Fstat, Df, object$df.residual, lower.tail = FALSE)
+    out <- data.frame(c(NA, Df),
+                      c(NA, Dev),
+                      c(object$df.null, object$df.residual),
+                      c(object$null.deviance, object$deviance),
+                      c(NA, Fstat),
+                      c(NA, pval))
+    colnames(out) <- c("Df", "Deviance", "Resid. Df", "Resid. Dev", "F", "Pr(>F)")
+    rownames(out) <- c("NULL", "Model")
+    class(out) <- c("anova", "data.frame")
+    out
+}
+
+`anova.GO2list` <-
+    function(object, ...)
+{
+    nmodels <- length(object)
+    resdev <- sapply(object, deviance)
+    resdf <- sapply(object, df.residual)
+    df <- -diff(resdf)
+    n <- sapply(object, function(z) nrow(z$points))
+    table <- data.frame(resdf, resdev, c(NA, -diff(resdf)),
+                        c(NA, -diff(resdev)))
+    dimnames(table) <- list(1L:nmodels, c("Resid. Df", "Resid. Dev", 
+                                          "Df", "Deviance"))
+    big <- which.min(resdf)
+    scale <- resdev[big]/resdf[big]
+    table <- stat.anova(table, test="F", scale = scale,
+                        df.scale = resdf[big], n[big])
+    class(table) <- c("anova", "data.frame")
+    table
+}
+
+## spdev functions analyse each species separately with F-test
+
+`spanodev` <-
+    function(mod1, mod2 = NULL, ...)
+{
+    if (is.null(mod2)) {
+        dev1 <- mod1$null.spdev
+        dev2 <- mod1$spdev
+        df1 <- 1
+        df2 <- mod1$k + 1
+        dfr <- df.residual(mod1)/length(dev1)
+        labs <- c("Null", "Model")
+    } else {
+        dev1 <- mod1$spdev
+        dev2 <- mod2$spdev
+        df1 <- mod1$k + 1
+        df2 <- mod2$k + 1
+        dfr <- min(df.residual(mod1), df.residual(mod2))/length(dev1)
+        labs <- paste0("Model", 1:2)
+    }
+    ddev <- dev1 - dev2
+    n <- nrow(mod1$fitted)
+    ddf <- df2 - df1
+    table <- data.frame(dev1, dev2, ddev)
+    big <- which.max(c(df1,df2))
+    scl <- table[,big]/dfr
+    table$f <- table[,3]/ddf/scl
+    table$p <- pf(table$f, ddf, dfr, lower.tail = FALSE)
+    colnames(table) <- c(labs, "Change", "F", "Pr(>F)")
+    head <- gettextf("F statistics based on (%d, %.1f) degrees of freedom", ddf, dfr)
+    structure(table, heading = head, class = c("anova", "data.frame"))
 }
