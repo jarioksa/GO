@@ -102,12 +102,27 @@ GO2 <-
         x <- matrix(p[1 : nn[1]], ncol=k)
         b0 <- p[(nn[1]+1) : nn[2]]
         b1 <- matrix(p[(nn[2]+1) : nn[3]], nrow = k, byrow=TRUE)
-        ## model lp = b0 -0.5*x^2 + b1*gr
+        ## model lp = b0 -0.5*x^2 + b1*x
         lp <- outer(-0.5*rowSums(x^2), b0, "+") + x %*% b1
-        sum(dev(y, ginv(lp), wts))
+        mu <- ginv(lp)
+        ## deviance/2 = -log-likelihood + constant
+        ll <- sum(dev(y, mu, wts))/2
+        ## Derivatives are based on McCullagh & Nelder 1989, p. 41
+        ## (eq. 2.13, and unnumbered equation on the same page)
+        attr(ll, "gradient") <- {
+            .der <- wts * (y - mu) /fam$var(mu) * fam$mu.eta(lp)
+            .ader <- colSums(.der)
+            .bder <- t(.der) %*% x
+            .xder <- sapply(seq_len(k), function(dim)
+                            rowSums(.der * outer(-x[,dim], b1[dim,], "+")))
+            ## Combine and reverse sign: we miminize instead of maximizing
+            .value <- -drop(c(as.vector(.xder), .ader, as.vector(.bder)))
+            .value
+        }
+        ll
     }
     mod <- nlm(loss, p = p, ...)
-    out <- list(deviance = mod$minimum, null.deviance = null.deviance,
+    out <- list(deviance = 2*mod$minimum, null.deviance = null.deviance,
                 k = k, iterations = mod$iterations, code = mod$code,
                 rank = length(mod$gradient),
                 df.residual = prod(dim(comm)) - length(mod$gradient),
