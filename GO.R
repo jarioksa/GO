@@ -55,7 +55,7 @@ GO1 <-
 ### correlated). May be tough.
 GO2 <-
     function(comm, k = 1, tot = max(comm), freqlim = 5,
-             family = c("poisson", "binomial"), ...)
+             family = c("poisson", "binomial"), far = 10, ...)
 {
     ## Limit to k <= 4
     if (k > 4)
@@ -109,12 +109,17 @@ GO2 <-
         tot <- rep(tot, length.out = nrow(comm))
     ## Loss function fits the current model and return the sum of
     ## deviances
+    alien <- logical(k * ncol(comm))
     loss <- function(p, ...) {
         ## split params
         x <- matrix(p[1 : nn[1]], ncol=k)
         b0 <- p[(nn[1]+1) : nn[2]]
         b1 <- matrix(p[(nn[2]+1) : nn[3]], nrow = k, byrow=TRUE)
-        far <- colSums(b1^2) > 100 + diff(range(x))^2
+        if (far) {
+            cnt <- colMeans(x)
+            diam <- sqrt(max(rowSums(sweep(x, 2, cnt)^2)))
+            alien <- sqrt(colSums(sweep(b1, 1, cnt)^2)) > far + diam
+        }
         ## model lp = b0 -0.5*x^2 + b1*x
         lp <- outer(-0.5*rowSums(x^2), b0, "+") + x %*% b1
         mu <- ginv(lp)
@@ -126,8 +131,8 @@ GO2 <-
             .der <- wts * (y - mu) /Var(mu) * mu.eta(lp)
             .ader <- colSums(.der)
             .bder <- t(.der) %*% x
-            if (any(far))
-                .bder[far,] <- 0
+            if (any(alien))
+                .bder[alien,] <- 0
             .xder <- sapply(seq_len(k), function(dim)
                             rowSums(.der * outer(-x[,dim], b1[dim,], "+")))
             ## Combine and reverse sign: we miminize instead of maximizing
