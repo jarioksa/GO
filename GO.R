@@ -54,7 +54,8 @@ GO1 <-
 ### the species optima and the Gaussian axis really are are
 ### correlated). May be tough.
 GO2 <-
-    function(comm, k = 1, tot = max(comm), freqlim = 5, ...)
+    function(comm, k = 1, tot = max(comm), freqlim = 5,
+             family = c("poisson", "binomial"), ...)
 {
     ## Limit to k <= 4
     if (k > 4)
@@ -72,19 +73,32 @@ GO2 <-
                      nrow(comm), ncol(comm)))
     ## define error family and get corresponding inverse link function
     ## ginv() and deviance function dev()
-    fam <- quasibinomial()
+    family <- match.arg(family)
+    fam <- switch(family,
+                  "poisson" = quasipoisson(),
+                  "binomial" = quasibinomial(),
+                  "gaussian" = gaussian(link=log))
     ginv <- fam$linkinv
     dev <- fam$dev.resids
+    Var <- fam$var
+    mu.eta <- fam$mu.eta
+    if (family != "binomial")
+        tot <- 1
     ## initialize gradient as DCA axes
     x <- as.matrix(scores(decorana(comm), display = "sites", choices = 1:k))
+    ## See if there are weights
+    wts <- matrix(rep(tot, ncol(comm)), nrow(comm), ncol(comm))
+    rwts <- wts[,1]
+    comm <- comm / wts
+    y <- as.matrix(comm)
     ## initial estimates for species (these are "final" with the
     ## current 'x')
-    mods <- lapply(comm, function(y) glm(cbind(y, tot-y) ~
+    mods <- lapply(comm, function(y) glm(y ~
                                          x + offset(-0.5 * rowSums(x^2)),
-                                         family = fam))
+                                         family = fam, weights=rwts))
     b <- sapply(mods, coef)
-    null.spdev <- sapply(lapply(comm, function(y) glm(cbind(y, tot-y) ~ 1,
-           family= fam)), function(z) z$deviance)
+    null.spdev <- sapply(lapply(comm, function(y) glm(y ~ 1,
+           family= fam, weights=rwts)), function(z) z$deviance)
     null.deviance <- sum(null.spdev)
     ## Pack parameters to a single vector
     p <- c(as.vector(x), as.vector(t(b)))
@@ -93,8 +107,6 @@ GO2 <-
     ## divide with 'tot'
     if (length(tot) < nrow(comm))
         tot <- rep(tot, length.out = nrow(comm))
-    wts <- matrix(rep(tot, ncol(comm)), nrow(comm), ncol(comm))
-    y <- as.matrix(comm) / wts
     ## Loss function fits the current model and return the sum of
     ## deviances
     loss <- function(p, ...) {
@@ -111,7 +123,7 @@ GO2 <-
         ## Derivatives are based on McCullagh & Nelder 1989, p. 41
         ## (eq. 2.13, and unnumbered equation on the same page)
         attr(ll, "gradient") <- {
-            .der <- wts * (y - mu) /fam$var(mu) * fam$mu.eta(lp)
+            .der <- wts * (y - mu) /Var(mu) * mu.eta(lp)
             .ader <- colSums(.der)
             .bder <- t(.der) %*% x
             if (any(far))
@@ -137,6 +149,7 @@ GO2 <-
     out$b0 <- specpara[,1, drop=FALSE]
     ## centre data
     cnt <- colMeans(out$points)
+    ## height para needs adjustment for moving species scores
     out$b0 <- out$b0 + out$species %*% cnt - 0.5 * sum(cnt^2)
     out$points <- sweep(out$points, 2, cnt)
     out$species <- sweep(out$species, 2, cnt)
