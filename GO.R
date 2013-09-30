@@ -102,6 +102,7 @@ GO2 <-
         x <- matrix(p[1 : nn[1]], ncol=k)
         b0 <- p[(nn[1]+1) : nn[2]]
         b1 <- matrix(p[(nn[2]+1) : nn[3]], nrow = k, byrow=TRUE)
+        far <- colSums(b1^2) > 100 + diff(range(x))^2
         ## model lp = b0 -0.5*x^2 + b1*x
         lp <- outer(-0.5*rowSums(x^2), b0, "+") + x %*% b1
         mu <- ginv(lp)
@@ -113,10 +114,13 @@ GO2 <-
             .der <- wts * (y - mu) /fam$var(mu) * fam$mu.eta(lp)
             .ader <- colSums(.der)
             .bder <- t(.der) %*% x
+            if (any(far))
+                .bder[far,] <- 0
             .xder <- sapply(seq_len(k), function(dim)
                             rowSums(.der * outer(-x[,dim], b1[dim,], "+")))
             ## Combine and reverse sign: we miminize instead of maximizing
             .value <- -drop(c(as.vector(.xder), .ader, as.vector(.bder)))
+            ##plot(.value, pch=".", ylim=c(-30,30))
             .value
         }
         ll
@@ -126,11 +130,16 @@ GO2 <-
                 k = k, iterations = mod$iterations, code = mod$code,
                 rank = length(mod$gradient),
                 df.residual = prod(dim(comm)) - length(mod$gradient),
-                df.null = prod(dim(comm)) - ncol(comm))
+                df.null = prod(dim(comm)) - ncol(comm), gradient = mod$gradient)
     out$points <- matrix(mod$estimate[1 : nn[1]], ncol=k)
     specpara <- t(matrix(mod$estimate[(nn[1]+1) : nn[3]], nrow = k+1, byrow = TRUE))
     out$species <- specpara[,-1, drop=FALSE]
     out$b0 <- specpara[,1, drop=FALSE]
+    ## centre data
+    cnt <- colMeans(out$points)
+    out$b0 <- out$b0 + out$species %*% cnt - 0.5 * sum(cnt^2)
+    out$points <- sweep(out$points, 2, cnt)
+    out$species <- sweep(out$species, 2, cnt)
     out$fitted <- ginv(outer(-0.5*rowSums(out$points^2), drop(out$b0), "+") +
         out$points %*% t(out$species))
     out$spdev <- colSums(dev(y, out$fitted, wts))
@@ -155,8 +164,8 @@ GO2 <-
     cat(switch(x$code,
                "(converged)",
                "(iterates within tolerance, probably converged)",
-               "(step failed, perhaps a local minimum)",
-               "(too many iterations)",
+               "(perhaps a local minimum)",
+               "(iteration limit reached)",
                "(convergence failed)"), "\n\n")
     devs <- c(x$null.deviance, x$null.deviance - x$deviance, x$deviance)
     props <- c(NA, devs[2:3]/devs[1])
