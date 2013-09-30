@@ -140,6 +140,11 @@ GO2 <-
     out$b0 <- out$b0 + out$species %*% cnt - 0.5 * sum(cnt^2)
     out$points <- sweep(out$points, 2, cnt)
     out$species <- sweep(out$species, 2, cnt)
+    ## rotate to PCs
+    pc <- prcomp(out$points)
+    out$points <- pc$x
+    out$species <- out$species %*% pc$rotation
+    ## recreate fitted data
     out$fitted <- ginv(outer(-0.5*rowSums(out$points^2), drop(out$b0), "+") +
         out$points %*% t(out$species))
     out$spdev <- colSums(dev(y, out$fitted, wts))
