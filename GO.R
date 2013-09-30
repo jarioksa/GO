@@ -347,3 +347,31 @@ GO2 <-
                          family = family)))
     c(as.vector(x), as.vector(t(b)))
 }
+
+`predict.GO2` <-
+    function(object, newdata, type = c("response", "link"), ...)
+{
+    type <- match.arg(type)
+    if (missing(newdata))
+        x <- object$points
+    else {
+        x <- newdata
+        if (length(dim(x)) == 2) {
+            if (ncol(x) != object$k)
+                stop(gettextf("number of columns in 'newdata' should be %d, was %d",
+                              object$k, ncol(x)))
+        } else {
+            if (length(x) != object$k)
+                stop(gettextf("number of items in 'newdata' should be %d, was %d",
+                              object$k, length(x)))
+            x <- matrix(x, ncol = object$k)
+        }
+    }
+    a <- drop(object$b0)
+    b <- object$species
+    eta <-  outer(-0.5 * rowSums(x^2), a, "+") + x %*% t(b)
+    if (type == "response")
+        object$family$linkinv(eta)
+    else
+        eta
+}
