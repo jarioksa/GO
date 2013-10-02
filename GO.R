@@ -12,6 +12,7 @@ GO1 <-
     ## Remove rare species
     freq <- colSums(comm > 0)
     comm <- comm[, freq >= freqlim]
+    y <- as.matrix(comm)
     rs <- rowSums(comm)
     if (any(rs <= 0))
         warning(
@@ -22,24 +23,37 @@ GO1 <-
     ## initialize gradient as first DCA axis
     x <- scores(decorana(comm), display = "sites", choices = 1)
     ## loss function with quasibinomial glm
+    ## partial derivatives x
+    grad <- function(y, x, tot, mods, fam = quasibinomial()) {
+        eta <- sapply(mods, predict, type="link")
+        mu <- fam$linkinv(eta)
+        b <- sapply(mods, coef)[2,]
+        -rowSums(tot * (y-mu) / fam$var(mu) * fam$mu.eta(eta) *
+            outer(-x, b, "+"))
+    }
     if (parallel > 1)
         loss <- function(x, ...) {
             mods <- parLapply(clu, comm, 
                               function(y, ...)
                               glm(cbind(y, tot-y) ~ x + offset(-0.5 * x^2),
                                   family = quasibinomial))
-            sum(sapply(mods, deviance))
+            ll <- sum(sapply(mods, deviance))/2
+            attr(ll, "gradient") <- grad(y/tot, x, tot, mods)
+            ll
         }
     else
         loss <- function(x, ...) {
             mods <- lapply(comm, function(y, ...)
                            glm(cbind(y, tot-y) ~ x + offset(-0.5 * x^2),
                                family = quasibinomial))
-            sum(sapply(mods, deviance))
+            ll <- sum(sapply(mods, deviance))/2
+            attr(ll, "gradient") <- grad(y/tot, x, tot, mods)
+            ll
         }
     ## ML fit
     out <- nlm(loss, p = x, comm = comm, tot = tot, ...)
-    out$data <- comm
+    out$minimum <- 2 * out$minimum
+    out$data <- as.matrix(comm)
     out$tot = tot
     class(out) <- "GO1"
     out
