@@ -179,6 +179,8 @@ GO2 <-
     ## recreate fitted data
     out$fitted <- ginv(outer(-0.5*rowSums(out$points^2), drop(out$b0), "+") +
         out$points %*% t(out$species))
+    ## observed data (as analysed in the model)
+    out$y <- y
     out$spdev <- colSums(dev(y, out$fitted, wts))
     out$null.spdev <- null.spdev
     rownames(out$points) <- rownames(comm)
@@ -396,9 +398,13 @@ GO2 <-
 `calibrate.GO2` <-
     function(object, newdata, ...)
 {
-    if(!missing(newdata))
-        .NotYetUsed("newdata")
-    data <- object$y
+    if(!missing(newdata)) { 
+        data <- newdata
+        data <- data[, colnames(object$y), drop=FALSE]
+        data <- as.matrix(data)
+    }
+    else
+        data <- object$y
     ginv <- object$family$linkinv
     dev <- object$family$dev.resids
     mu.eta <- object$family$mu.eta
@@ -413,10 +419,12 @@ GO2 <-
             -((y-mu)/V(mu)*mu.eta(eta)) %*% sweep(b, 2, p)
         ll
     }
-    xmod <- object$points
+    ##xmod <- object$points
+    xmod <- wascores(b, t(data))
+    xmod <- matrix(0, nrow=nrow(data), ncol=object$k)
     xcal <- lapply(seq_len(NROW(data)),
                    function(i, ...) nlm(loss, p = xmod[i,], y = data[i,], hessian = TRUE,...))
-    #t(sapply(xcal, function(z) z$estimate))
-    xcal
+    t(sapply(xcal, function(z) z$estimate))
+    #xcal
 }
 
