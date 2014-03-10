@@ -389,3 +389,34 @@ GO2 <-
     else
         eta
 }
+
+### The calibrate function finds the most likely gradient position
+### (location of 'points') given the observed community composition
+### and the fitted GO2 model.
+`calibrate.GO2` <-
+    function(object, newdata, ...)
+{
+    if(!missing(newdata))
+        .NotYetUsed("newdata")
+    data <- object$y
+    ginv <- object$family$linkinv
+    dev <- object$family$dev.resids
+    mu.eta <- object$family$mu.eta
+    V <- object$family$var
+    b <- object$species
+    ## loss function evaluates for a single SU
+    loss <- function(p, y, ...) {
+        eta <- predict(object, newdata = p, type = "link")
+        mu <- ginv(eta)
+        ll <- sum(dev(y, mu, rep(1,length(y))))/2
+        attr(ll, "gradient") <-
+            -((y-mu)/V(mu)*mu.eta(eta)) %*% sweep(b, 2, p)
+        ll
+    }
+    xmod <- object$points
+    xcal <- lapply(seq_len(NROW(data)),
+                   function(i, ...) nlm(loss, p = xmod[i,], y = data[i,], hessian = TRUE,...))
+    #t(sapply(xcal, function(z) z$estimate))
+    xcal
+}
+
