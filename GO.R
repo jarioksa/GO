@@ -419,11 +419,20 @@ GO2 <-
             -((y-mu)/V(mu)*mu.eta(eta)) %*% sweep(b, 2, p)
         ll
     }
-    ##xmod <- object$points
-    xmod <- wascores(b, t(data))
-    xmod <- matrix(0, nrow=nrow(data), ncol=object$k)
+    ## initial estimates as WA scores of species optima
+    bb <- b
+    ## sanitize species scores: no extrapolation
+    xx <- apply(object$points, 2, range)
+    bb[,1] <- ifelse(bb[,1] < xx[1,1], xx[1,1], bb[,1])
+    bb[,1] <- ifelse(bb[,1] > xx[2,1], xx[2,1], bb[,1])
+    bb[,2] <- ifelse(bb[,2] < xx[1,2], xx[1,2], bb[,2])
+    bb[,2] <- ifelse(bb[,2] > xx[2,2], xx[2,2], bb[,2])
+    xmod <- wascores(bb, t(data))
+    ##xmod <- wascores(b, t(data))
+    ## Initialize as zero
+    ## xmod <- matrix(0, nrow=nrow(data), ncol=object$k)
     xcal <- lapply(seq_len(NROW(data)),
-                   function(i, ...) nlm(loss, p = xmod[i,], y = data[i,], hessian = TRUE,...))
+                   function(i, ...) nlm(loss, p = xmod[i,], y = data[i,], hessian = FALSE,...))
     t(sapply(xcal, function(z) z$estimate))
     #xcal
 }
