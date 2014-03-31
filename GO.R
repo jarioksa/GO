@@ -235,7 +235,7 @@ GO2 <-
 
 `plot.GO2` <-
     function(mod, choices = 1, label = FALSE, marginal = FALSE,
-             cex=0.7, ...)
+             cex=0.7, col = 1:6, ...)
 {
     x <- scores(mod, choices = choices, type="sites")
     ginv <- mod$family$linkinv
@@ -245,10 +245,10 @@ GO2 <-
         top <- top + 0.5 * rowSums(mod$species^2)
     fit <- ginv(outer(-0.5 * grad^2, top, "+") +
                 outer(grad, mod$species[,choices], "*"))
-    matplot(grad, fit, type = "l", lty=1, ...)
+    matplot(grad, fit, type = "l", lty=1, col=col, ...)
     rug(x)
     if (label) {
-        br <- eval(formals(matplot)$col)
+        br <- col
         xlab <- grad[apply(fit, 2, which.max)]
         ylab <- apply(fit, 2, max)
         ordilabel(cbind(xlab, ylab), cex = cex, border = br, col=1, ...)
