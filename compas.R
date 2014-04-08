@@ -5,7 +5,12 @@
         p[1]*exp(-(x[1]-p[2])^2/2/p[4]^2 - (x[2]-p[3])^2/2/p[5]^2) 
     }
     p <- matrix(0, nrow=nsp, ncol=5)
-    p[,1] <- exp(runif(nsp, -2.5, 0))
+    ## Integral of bivariate Gaussian is 2*pi*h*t. Uniform h gives
+    ## average h=0.5 and with t=1 this gives pi. The average of
+    ## log-Normal t is exp(tsd^2/2). To get desired alpha per SU, use
+    ## nsp = alpha * (xgrad + buffer) * (ygrad + buffer) / pi /
+    ## exp(tsd^2/2).
+    p[,1] <- runif(nsp)
     p[,2] <- runif(nsp, 0-buffer, xgrad+buffer)
     p[,3] <- runif(nsp, 0-buffer, ygrad+buffer)
     p[,4] <- rlnorm(nsp, 0, tsd)
