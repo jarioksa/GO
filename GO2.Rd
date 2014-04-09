@@ -5,7 +5,7 @@
 Unconstrained Gaussian Maximum Likelihood Ordination
 }
 \description{
-  The function fits unconstraine maximum likelihood ordination
+  The function fits unconstrained maximum likelihood ordination
   with unit-width Gaussian response models.
 }
 \usage{
@@ -41,11 +41,11 @@ spanodev(object, ...)
 }
   \item{far}{
   Threshold for distances of Gaussian optima that are regarded as alien and
-  will frozen in the estimation.
+  will be frozen in the estimation.
 }
   \item{object, mod}{\code{GO2} result object.}
   \item{choices}{The displayed dimension (axis).}
-  \item{label}{Label plotted response curves.}
+  \item{label}{Add name labels to plotted response curves.}
   \item{marginal}{Use marginal responses instead of slices through origin.}
   \item{cex, col}{Size of text and colours of lines.}
   \item{newdata}{New data.}
@@ -78,7 +78,9 @@ spanodev(object, ...)
   \pkg{vegan} function \code{\link[vegan]{MDSrotate}}, but this requires
   a version that agrees to analyse \code{GO2} results. Traditional 
   ordination plots of SU scores and species optima can be displayed
-  with \code{\link[vegan]{ordiplot}} (\pkg{vegan} package).
+  with \code{\link[vegan]{ordiplot}} (\pkg{vegan} package). The function
+  is written so that several other \pkg{vegan} and standard \R functions 
+  can handle results. 
 
 }
 \value{
