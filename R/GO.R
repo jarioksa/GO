@@ -392,7 +392,6 @@ GO2 <-
     out
 }
 
-#' @export
 `anova.GO2list` <-
     function(object, ...)
 {
