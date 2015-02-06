@@ -280,8 +280,8 @@ but I do not believe this will happen (but will try and see).
 I use a current and always changing version of Gaussian Ordination in
 these examples and data sets and functions from \pkg{vegan} package.
 <<>>=
+library(GO)
 library(vegan)
-source("GO.R")
 @ 
 The file \code{GO.R} contains main functions for analysis plus some
 support functions. All these are under work, and they will change, in
