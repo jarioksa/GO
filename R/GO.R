@@ -1,5 +1,22 @@
+#' Unconstrained Gaussian Maximum Likelihood Ordination
+
 ## unconstrained Gaussian ordination in one dimension
 
+#' @importFrom parallel makeCluster stopCluster
+#' 
+#' @param comm Community data matrix of data frame.
+#'
+#' @param tot Maximum abundance value or total used in Binomial models.
+#'
+#' @param freqlim Minimum number of occurrence for analysed species.
+#'
+#' @param parallel Number of parallel processes.
+#'
+#' @param \dots Other parameters passed to functions.
+#'
+#' @describeIn GO Alternating estimation of species parameters and
+#' gradient locations in one dimension.
+#' @export
 GO1 <-
     function(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
 {
@@ -67,6 +84,19 @@ GO1 <-
 ### there are m + k * (m + n) estimated parameters (and location of
 ### the species optima and the Gaussian axis really are are
 ### correlated). May be tough.
+
+#' @importFrom vegan decorana
+#' 
+#' @param k Number of estimated gradients (axes).
+#'
+#' @param family Error distribution.
+#'
+#' @param far Threshold distance for species optima regarded as
+#' outliers and frozen in fitting.
+#'
+#' @describeIn GO Simultaneous estimation of species parameters and
+#' gradient locations.
+#' @export
 GO2 <-
     function(comm, k = 1, tot = max(comm), freqlim = 5,
              family = c("poisson", "binomial"), far = 10, ...)
@@ -192,6 +222,7 @@ GO2 <-
     out
 }
 
+#' @export
 `print.GO2` <-
     function(x, digits = max(3, getOption("digits") - 3), ...)
 {
@@ -217,6 +248,10 @@ GO2 <-
     invisible(x)
 }
 
+#' @param mod Fitted model.
+#'
+#' @rdname GO
+#' @export
 `plot.GO1` <-
     function(mod, ...)
 {
@@ -233,6 +268,21 @@ GO2 <-
     rug(x)
 }
 
+#' @importFrom vegan ordilabel scores
+#' 
+#' @param choices The axis or axes plotted.
+#'
+#' @param label Label species responses.
+#'
+#' @param marginal Plot marginal responses or slice through origin of
+#' other dimensions.
+#'
+#' @param cex Character size for \code{labels}.
+#'
+#' @param col Colours of response curves.
+#'
+#' @rdname GO
+#' @export
 `plot.GO2` <-
     function(mod, choices = 1, label = FALSE, marginal = FALSE,
              cex=0.7, col = 1:6, ...)
@@ -257,6 +307,11 @@ GO2 <-
 
 
 ## Basic anova against Null model of constant response
+
+#' @param object Ordination result object.
+#'
+#' @rdname GO
+#' @export
 `anova.GO2` <-
     function(object, ...)
 {
@@ -284,6 +339,7 @@ GO2 <-
     out
 }
 
+#' @export
 `anova.GO2list` <-
     function(object, ...)
 {
@@ -306,6 +362,10 @@ GO2 <-
 
 ## spdev functions analyse each species separately with F-test
 
+#' @param mod1,mod2 Compared result objects
+#'
+#' @describeIn GO Comparison of goodness of fit for individual species.
+#' @export
 `spanodev` <-
     function(mod1, mod2 = NULL, ...)
 {
@@ -364,6 +424,13 @@ GO2 <-
     c(as.vector(x), as.vector(t(b)))
 }
 
+#' @param newdata New gradient locations for predicted responses
+#'
+#' @param type Predictions in the scale of responses or in the scale
+#' of link function.
+#'
+#' @rdname GO
+#' @export
 `predict.GO2` <-
     function(object, newdata, type = c("response", "link"), ...)
 {
@@ -395,6 +462,10 @@ GO2 <-
 ### The calibrate function finds the most likely gradient position
 ### (location of 'points') given the observed community composition
 ### and the fitted GO2 model.
+
+#' @importFrom vegan calibrate
+#' @rdname GO
+#' @export
 `calibrate.GO2` <-
     function(object, newdata, ...)
 {
