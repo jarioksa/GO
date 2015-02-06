@@ -1,3 +1,45 @@
+#' Community Pattern Simulation
+#'
+#' Function \code{compas} generates simulated binary occurrence data
+#' from Gaussian response function. The species optima are distributed
+#' uniformly in the gradient space (plus \code{buffer}), the response
+#' heights are distributed uniformly in \eqn{(0,1)}, and the response
+#' widths are lognormally distributed with mean \eqn{t=1} and standard
+#' deviation as given in the function call. Function \code{betapas}
+#' generates similar responses from beta response function. The
+#' function first generates Gaussian species parameter, and then
+#' transforms these to beta response functions with varying shapes,
+#' but same optima and average height (occurrence probability) as the
+#' corresponding Gaussian response.
+#' 
+#' @param nsp Number of simulated species. Some species will not occur
+#' in any simulated sample and the number of species is usually lower
+#' in simulation results.
+#'
+#' @param n Number of sample plots.
+#'
+#' @param xgrad Length of the first gradient in \eqn{t} units
+#' (a.k.a. \sQuote{sd} units).
+#'
+#' @param ygrad Length of the second gradient in \eqn{t} units.
+#'
+#' @param x Coordinates for gradient positions of sample plots.
+#'
+#' @param xn Number of sample plots along the first gradient in a
+#' regular grid. This argument will be used only if \code{x} was not
+#' given.
+#'
+#' @param yn Number of sample plots along the second gradient in a
+#' regular grid. This argument will be used only if \code{x} was not
+#' given.
+#'
+#' @param buffer Buffer zone around the sampled gradient space for
+#' simulated species optima.
+#'
+#' @param tsd Standard deviation of widths of species responses in
+#' lognormal distribution.
+#'
+#' @export
 `compas` <-
     function (nsp, n, xgrad=6, ygrad=4, x, xn=6, yn=4, buffer=2, tsd = 0.1) 
 {
@@ -46,6 +88,13 @@
     sol
 }
 
+#' @param range The range parameter of beta response.
+#'
+#' @param shape The range of shape parameters (\eqn{alpha},
+#' \eqn{gamma}) in uniform distribution.
+
+#' @describeIn compas
+#' @export
 `betapas` <-
     function (nsp, n, xgrad=6, ygrad=4, x, xn=6, yn=4, buffer=2, tsd=0.1,
               range=5, shape=c(0.5,6.5))
