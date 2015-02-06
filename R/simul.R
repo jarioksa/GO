@@ -18,6 +18,8 @@
 #'
 #' @param \dots Other arguments passed to \code{respfun}.
 #'
+#' @importFrom vegan specnumber metaMDS cca procrustes decorana
+#'
 #' @export
 `simulrun` <-
     function(nsimul = 1, nsp=300, n=100, xgrad = 2, ygrad = 2, respfun = compas, ...)
