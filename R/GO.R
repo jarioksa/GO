@@ -516,7 +516,7 @@ GO2 <-
 ### (location of 'points') given the observed community composition
 ### and the fitted GO2 model.
 
-#' @importFrom vegan calibrate
+#' @importFrom vegan calibrate wascores
 #' 
 #' @rdname GO
 #' @export
