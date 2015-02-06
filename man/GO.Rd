@@ -30,9 +30,12 @@ spanodev(mod1, mod2 = NULL, ...)
 calibrate.GO2(object, newdata, ...)
 }
 \arguments{
-\item{comm}{Community data matrix of data frame.}
+\item{comm}{Community data frame.}
 
-\item{tot}{Maximum abundance value or total used in Binomial models.}
+\item{tot}{Total abundance used in Binomial models. This can be
+either a single value for all data, or a vector with value for each
+row of \code{comm}. The default is to use the maximum value in
+matrix.}
 
 \item{freqlim}{Minimum number of occurrence for analysed species.}
 
@@ -40,10 +43,12 @@ calibrate.GO2(object, newdata, ...)
 
 \item{k}{Number of estimated gradients (axes).}
 
-\item{family}{Error distribution.}
+\item{family}{Error distribution. Can be either \code{"poisson"}
+for quasi-Poisson or \code{"binomial"} for quasi-Binomial (and must
+be quoted).}
 
 \item{far}{Threshold distance for species optima regarded as
-outliers and frozen in fitting.}
+alien and frozen in fitting.}
 
 \item{mod}{Fitted model.}
 
@@ -67,10 +72,39 @@ other dimensions.}
 \item{type}{Predictions in the scale of responses or in the scale
 of link function.}
 
-\item{\dots}{Other parameters passed to functions.}
+\item{\dots}{Other parameters passed to functions. In \code{GO2}
+these are passed to \code{\link{nlm}} and can include, e.g.,
+\code{iterlim} (which often must be set to higher value than the
+default 100).}
 }
 \description{
-Unconstrained Gaussian Maximum Likelihood Ordination
+The functions fit unconstrained maximum likelihood ordination with
+unit-width Gaussian response models.
+}
+\details{
+Function is under development and unreleased. It will be released
+ under different name in \pkg{vegan}. The current version is only
+ provided for review purposes. The function and its support functions
+ require \pkg{vegan}, although this requirements is not explicitly
+ made. The optimization is based on \code{\link{nlm}} function, and passes
+ arguments to this function.
+
+ Function \code{anova} can analyse two nested models or a single model
+ against null model of flat responses using parametric tests based on
+ quasi-Likelihood. Function \code{spanodev} performs similar test
+ split by species. Function \code{predict} returns estimated response
+ curves, and \code{newdata} can be gradient locations. Function
+ \code{calibrate} returns estimated gradient locations, and \code{newdata}
+ can be community data.
+
+ The \code{plot} function displays fitted respose curves against one
+ ordination axis. In principle, the ordination can be rotated using
+ \pkg{vegan} function \code{\link[vegan]{MDSrotate}}, but this requires
+ a version that agrees to analyse \code{GO2} results. Traditional
+ ordination plots of SU scores and species optima can be displayed
+ with \code{\link[vegan]{ordiplot}} (\pkg{vegan} package). The function
+ is written so that several other \pkg{vegan} and standard \R functions
+ can handle results.
 }
 \section{Functions}{
 \itemize{
@@ -82,4 +116,20 @@ gradient locations.
 
 \item \code{spanodev}: Comparison of goodness of fit for individual species.
 }}
+\examples{
+library(vegan) ## *must* be given before using the function
+data(varespec)
+mod <- GO2(varespec, k=2, far=5, tot=100, family="binomial", iterlim=1000)
+plot(mod, label=TRUE)
+ordiplot(mod, type="t")
+ordiplot(mod, dis="si", type="t")
+anova(mod)
+mod1 <- update(mod, k=1)
+anova(mod1, mod)
+spanodev(mod1)
+spanodev(mod1, mod)
+}
+\seealso{
+\code{\link[VGAM]{cgo}} in \pkg{VGAM} package.
+}
 
