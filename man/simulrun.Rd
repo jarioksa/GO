@@ -16,9 +16,7 @@ because some species do not occur in any simulated communities.}
 
 \item{n}{Number of sample plots passed to \code{respfun}.}
 
-\item{xgrad}{Length of the first gradient passed to \code{respfun}.}
-
-\item{ygrad}{Length of the second gradient passed to \code{respfun}.}
+\item{xgrad,ygrad}{Lengths of gradients passed to \code{respfun}.}
 
 \item{respfun}{The response function used in simulations.}
 

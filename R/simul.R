@@ -12,9 +12,7 @@
 #'
 #' @param n Number of sample plots passed to \code{respfun}.
 #'
-#' @param xgrad Length of the first gradient passed to \code{respfun}.
-#'
-#' @param ygrad Length of the second gradient passed to \code{respfun}.
+#' @param xgrad,ygrad Lengths of gradients passed to \code{respfun}.
 #'
 #' @param respfun The response function used in simulations.
 #'
