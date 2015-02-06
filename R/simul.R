@@ -1,3 +1,26 @@
+#' Run a Set of Simulations and Collect Results
+#'
+#' Function is a general driver to run several ordination methods on a
+#' set of simulated data sets and collect the goodness of fit
+#' statistics for the results.
+#'
+#' @param nsimul Number of simulations.
+#'
+#' @param nsp Number of species in simulations passed to
+#' \code{respfun}. The realized number can be (and usually is) lower
+#' because some species do not occur in any simulated communities.
+#'
+#' @param n Number of sample plots passed to \code{respfun}.
+#'
+#' @param xgrad Length of the first gradient passed to \code{respfun}.
+#'
+#' @param ygrad Length of the second gradient passed to \code{respfun}.
+#'
+#' @param respfun The response function used in simulations.
+#'
+#' @param \dots Other arguments passed to \code{respfun}.
+#'
+#' @export
 `simulrun` <-
     function(nsimul = 1, nsp=300, n=100, xgrad = 2, ygrad = 2, respfun = compas, ...)
 {
