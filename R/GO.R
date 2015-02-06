@@ -300,13 +300,14 @@ GO2 <-
     invisible(x)
 }
 
-#' @param mod Fitted model.
+#' @param x Fitted model.
 #'
 #' @rdname GO
 #' @export
 `plot.GO1` <-
-    function(mod, ...)
+    function(x, ...)
 {
+    mod <- x
     x <- mod$estimate
     tot <- mod$tot
     comm <- mod$data
@@ -336,9 +337,10 @@ GO2 <-
 #' @rdname GO
 #' @export
 `plot.GO2` <-
-    function(mod, choices = 1, label = FALSE, marginal = FALSE,
+    function(x, choices = 1, label = FALSE, marginal = FALSE,
              cex=0.7, col = 1:6, ...)
 {
+    mod <- x
     x <- scores(mod, choices = choices, type="sites")
     ginv <- mod$family$linkinv
     grad <- seq(min(x), max(x), len=101)

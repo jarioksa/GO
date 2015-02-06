@@ -16,9 +16,9 @@ GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
 GO2(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
   "binomial"), far = 10, ...)
 
-\method{plot}{GO1}(mod, ...)
+\method{plot}{GO1}(x, ...)
 
-\method{plot}{GO2}(mod, choices = 1, label = FALSE, marginal = FALSE,
+\method{plot}{GO2}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)
 
 \method{anova}{GO2}(object, ...)
@@ -50,7 +50,7 @@ be quoted).}
 \item{far}{Threshold distance for species optima regarded as
 alien and frozen in fitting.}
 
-\item{mod}{Fitted model.}
+\item{x}{Fitted model.}
 
 \item{choices}{The axis or axes plotted.}
 
