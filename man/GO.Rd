@@ -27,7 +27,7 @@ spanodev(mod1, mod2 = NULL, ...)
 
 \method{predict}{GO2}(object, newdata, type = c("response", "link"), ...)
 
-calibrate.GO2(object, newdata, ...)
+\method{calibrate}{GO2}(object, newdata, ...)
 }
 \arguments{
 \item{comm}{Community data frame.}
