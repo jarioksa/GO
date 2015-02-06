@@ -581,16 +581,18 @@ Let us see first how one dimension ``explains'' each species:
 <<>>=
 spanodev(m1)
 @ 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\linewidth]{DSCN1123.jpg}
-  \caption{\emph{Cladina stellaris}, the most influential species in the ordination example.}
-  \label{fig:Claste}
-\end{figure}
+%\begin{figure}
+%  \centering
+%  \includegraphics[width=0.7\linewidth]{DSCN1123.jpg}
+%  \caption{\emph{Cladina stellaris}, the most influential species in the ordina%tion example.}
+%  \label{fig:Claste}
+%\end{figure}
 It is remarkable how unevenly species contribute to the model fit, and
 some species are actually more poorly explained by the model than the
 Null of constant abundance. One single species (\code{Cla.ste},
-\emph{Cladina stellaris}, Fig.~\ref{fig:Claste}) contributes more than
+\emph{Cladina stellaris})
+%, Fig.~\ref{fig:Claste}) 
+contributes more than
 half of the modelled deviance.  The situation is similar as in
 non-scaled PCA where species with large variance are the only worth
 explaining. Some weight equalizing trick should be developed. However,
