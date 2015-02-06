@@ -517,6 +517,7 @@ GO2 <-
 ### and the fitted GO2 model.
 
 #' @importFrom vegan calibrate
+#' 
 #' @rdname GO
 #' @export
 `calibrate.GO2` <-

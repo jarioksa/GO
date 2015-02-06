@@ -4,4 +4,5 @@ Version: 0.1-0
 Authors@R: "Jari Oksanen <jari.oksanen@oulu.fi> [aut, cre]"
 Description: Package contains functions used to produce a manuscript on 
   Gaussian Ordination
+Imports: vegan, parallel
 License: GPL-2

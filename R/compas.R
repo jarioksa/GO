@@ -18,27 +18,22 @@
 #'
 #' @param n Number of sample plots.
 #'
-#' @param xgrad Length of the first gradient in \eqn{t} units
+#' @param xgrad,ygrad Lengths of  gradients in \eqn{t} units
 #' (a.k.a. \sQuote{sd} units).
-#'
-#' @param ygrad Length of the second gradient in \eqn{t} units.
 #'
 #' @param x Coordinates for gradient positions of sample plots.
 #'
-#' @param xn Number of sample plots along the first gradient in a
+#' @param xn,yn Number of sample plots along gradients in a
 #' regular grid. This argument will be used only if \code{x} was not
 #' given.
 #'
-#' @param yn Number of sample plots along the second gradient in a
-#' regular grid. This argument will be used only if \code{x} was not
-#' given.
-#'
-#' @param buffer Buffer zone around the sampled gradient space for
+#' #' @param buffer Buffer zone around the sampled gradient space for
 #' simulated species optima.
 #'
 #' @param tsd Standard deviation of widths of species responses in
 #' lognormal distribution.
 #'
+#' @describeIn compas Simulation with Gaussian response functions.
 #' @export
 `compas` <-
     function (nsp, n, xgrad=6, ygrad=4, x, xn=6, yn=4, buffer=2, tsd = 0.1) 
@@ -93,7 +88,7 @@
 #' @param shape The range of shape parameters (\eqn{alpha},
 #' \eqn{gamma}) in uniform distribution.
 
-#' @describeIn compas
+#' @describeIn compas Simulation with beta response functions.
 #' @export
 `betapas` <-
     function (nsp, n, xgrad=6, ygrad=4, x, xn=6, yn=4, buffer=2, tsd=0.1,

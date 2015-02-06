@@ -18,20 +18,16 @@ in simulation results.}
 
 \item{n}{Number of sample plots.}
 
-\item{xgrad}{Length of the first gradient in \eqn{t} units
+\item{xgrad,ygrad}{Lengths of  gradients in \eqn{t} units
 (a.k.a. \sQuote{sd} units).}
-
-\item{ygrad}{Length of the second gradient in \eqn{t} units.}
 
 \item{x}{Coordinates for gradient positions of sample plots.}
 
-\item{xn}{Number of sample plots along the first gradient in a
+\item{xn,yn}{Number of sample plots along gradients in a
 regular grid. This argument will be used only if \code{x} was not
-given.}
+given.
 
-\item{yn}{Number of sample plots along the second gradient in a
-regular grid. This argument will be used only if \code{x} was not
-given.}
+#'}
 
 \item{buffer}{Buffer zone around the sampled gradient space for
 simulated species optima.}
@@ -59,6 +55,8 @@ corresponding Gaussian response.
 }
 \section{Functions}{
 \itemize{
-\item \code{betapas}: 
+\item \code{compas}: Simulation with Gaussian response functions.
+
+\item \code{betapas}: Simulation with beta response functions.
 }}
 
