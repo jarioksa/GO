@@ -1,3 +1,4 @@
+%\VignetteIndexEntry{Unconstrained Gaussian Maximum Likelihood Ordination}
 \documentclass[a4paper,10pt]{article}
 
 \usepackage{vegan} % vegan settings
