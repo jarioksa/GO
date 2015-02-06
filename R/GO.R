@@ -71,7 +71,6 @@ GO1 <-
 {
     ## do parallel?
     if(parallel > 1) {
-        require(parallel) || stop("needs 'parallel' package")
         clu <- makeCluster(parallel)
         on.exit(stopCluster(clu))
     }
