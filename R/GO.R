@@ -45,7 +45,7 @@
 
 ## unconstrained Gaussian ordination in one dimension
 
-#' @importFrom parallel makeCluster stopCluster
+#' @import parallel
 #' 
 #' @param comm Community data frame.
 #'
