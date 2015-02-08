@@ -147,7 +147,7 @@ GO1 <-
     out$family <- spmods[[1]]$family
     out$tot <- tot
     out$call <- match.call()
-    class(out) <- c("GO1", "GO2")
+    class(out) <- "GO"
     out
 }
 
@@ -295,14 +295,14 @@ GO2 <-
     colnames(out$species) <- paste0("b", 1:k)
     out$family <- fam
     out$call <- match.call()
-    class(out) <- "GO2"
+    class(out) <- "GO"
     out
 }
 
 #' @importFrom vegan pasteCall
 #' 
 #' @export
-`print.GO2` <-
+`print.GO` <-
     function(x, digits = max(3, getOption("digits") - 3), ...)
 {
     cat(gettextf(ngettext(x$k, "Gaussian Ordination with %d dimension\n",
@@ -344,7 +344,7 @@ GO2 <-
 #'
 #' @rdname GO
 #' @export
-`plot.GO2` <-
+`plot.GO` <-
     function(x, choices = 1, label = FALSE, marginal = FALSE,
              cex=0.7, col = 1:6, ...)
 {
@@ -374,7 +374,7 @@ GO2 <-
 #'
 #' @rdname GO
 #' @export
-`anova.GO2` <-
+`anova.GO` <-
     function(object, ...)
 {
     ## Check first if this should go to anova.GO2list
@@ -492,7 +492,7 @@ GO2 <-
 #'
 #' @rdname GO
 #' @export
-`predict.GO2` <-
+`predict.GO` <-
     function(object, newdata, type = c("response", "link"), ...)
 {
     type <- match.arg(type)
@@ -528,7 +528,7 @@ GO2 <-
 #' 
 #' @rdname GO
 #' @export
-`calibrate.GO2` <-
+`calibrate.GO` <-
     function(object, newdata, ...)
 {
     if(!missing(newdata)) { 
@@ -569,4 +569,3 @@ GO2 <-
     t(sapply(xcal, function(z) z$estimate))
     #xcal
 }
-

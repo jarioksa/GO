@@ -3,10 +3,10 @@
 \name{GO1}
 \alias{GO1}
 \alias{GO2}
-\alias{anova.GO2}
-\alias{calibrate.GO2}
-\alias{plot.GO2}
-\alias{predict.GO2}
+\alias{anova.GO}
+\alias{calibrate.GO}
+\alias{plot.GO}
+\alias{predict.GO}
 \alias{spanodev}
 \title{Unconstrained Gaussian Maximum Likelihood Ordination}
 \usage{
@@ -15,16 +15,16 @@ GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
 GO2(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
   "binomial"), far = 10, ...)
 
-\method{plot}{GO2}(x, choices = 1, label = FALSE, marginal = FALSE,
+\method{plot}{GO}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)
 
-\method{anova}{GO2}(object, ...)
+\method{anova}{GO}(object, ...)
 
 spanodev(mod1, mod2 = NULL, ...)
 
-\method{predict}{GO2}(object, newdata, type = c("response", "link"), ...)
+\method{predict}{GO}(object, newdata, type = c("response", "link"), ...)
 
-\method{calibrate}{GO2}(object, newdata, ...)
+\method{calibrate}{GO}(object, newdata, ...)
 }
 \arguments{
 \item{comm}{Community data frame.}
