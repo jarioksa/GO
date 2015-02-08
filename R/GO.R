@@ -116,11 +116,24 @@ GO1 <-
             ll
         }
     ## ML fit
-    out <- nlm(loss, p = x, comm = comm, tot = tot, ...)
-    out$minimum <- 2 * out$minimum
-    out$data <- as.matrix(comm)
-    out$tot = tot
-    class(out) <- "GO1"
+    mod <- nlm(loss, p = x, comm = comm, tot = tot, ...)
+    rank <- 2 * ncol(comm) + nrow(comm)
+    out <- list(deviance = 2 * mod$minimum, null.deviance = NA,
+                k = 1, iterations = mod$iterations, code = mod$code,
+                rank = rank, df.residual = prod(dim(comm)) - rank,
+                df.null = prod(dim(comm)) - ncol(comm),
+                gradient = mod$gradient)
+    out$points <- matrix(mod$estimate, ncol=1)
+    out$species <- NA
+    out$b0 <- NA
+    out$fitted <- NA
+    out$y <- as.matrix(comm)
+    out$spdev <- NA
+    out$null.spdev <- NA
+    out$family <- "binomial"
+    out$tot <- tot
+    out$call <- match.call()
+    class(out) <- c("GO1", "GO2")
     out
 }
 
