@@ -118,19 +118,33 @@ GO1 <-
     ## ML fit
     mod <- nlm(loss, p = x, comm = comm, tot = tot, ...)
     rank <- 2 * ncol(comm) + nrow(comm)
-    out <- list(deviance = 2 * mod$minimum, null.deviance = NA,
-                k = 1, iterations = mod$iterations, code = mod$code,
+    out <- list(deviance = 2 * mod$minimum, k = 1,
+                iterations = mod$iterations, code = mod$code,
                 rank = rank, df.residual = prod(dim(comm)) - rank,
                 df.null = prod(dim(comm)) - ncol(comm),
                 gradient = mod$gradient)
     out$points <- matrix(mod$estimate, ncol=1)
-    out$species <- NA
-    out$b0 <- NA
-    out$fitted <- NA
+    ## Refit model with the current estimate of gradient points to get
+    ## the species parameters
+    x <- mod$estimate
+    spmods <- lapply(comm, function(y, ...)
+        glm(cbind(y, tot-y) ~ x + offset(-0.5 * x^2),
+            family=quasibinomial))
+    b <- sapply(spmods, coef)
+    out$species <- matrix(b[2,], ncol=1)
+    out$b0 <- matrix(b[1,], ncol=1)
+    rownames(out$species) <- colnames(comm)
+    rownames(out$b0) <- colnames(comm)
+    out$fitted <- sapply(spmods, fitted)
     out$y <- as.matrix(comm)
-    out$spdev <- NA
-    out$null.spdev <- NA
-    out$family <- "binomial"
+    out$spdev <- sapply(spmods, deviance)
+    null.spdev <- sapply(lapply(comm,
+                                function(y) glm(cbind(y, tot-y)~ 1,
+                                                family= quasibinomial)),
+                         function(z) z$deviance)
+    out$null.spdev <- null.spdev
+    out$null.deviance <- sum(null.spdev)
+    out$family <- spmods[[1]]$family
     out$tot <- tot
     out$call <- match.call()
     class(out) <- c("GO1", "GO2")
@@ -313,29 +327,10 @@ GO2 <-
     invisible(x)
 }
 
-#' @param x Fitted model.
-#'
-#' @rdname GO
-#' @export
-`plot.GO1` <-
-    function(x, ...)
-{
-    mod <- x
-    x <- mod$estimate
-    tot <- mod$tot
-    comm <- mod$data
-    mods <- lapply(comm, function(y, ...)
-                   glm(cbind(y, tot-y) ~ x + offset(-0.5 * x^2),
-                   family = quasibinomial))
-    grad <- seq(min(x), max(x), len=101)
-    fit <- sapply(mods, function(z)
-                  predict(z, newdata = list(x = grad), type = "response"))
-    matplot(grad, fit, type="l", lty=1, ...)
-    rug(x)
-}
-
 #' @importFrom vegan ordilabel scores
 #' 
+#' @param x Fitted model.
+#'
 #' @param choices The axis or axes plotted.
 #'
 #' @param label Label species responses.

@@ -5,7 +5,6 @@
 \alias{GO2}
 \alias{anova.GO2}
 \alias{calibrate.GO2}
-\alias{plot.GO1}
 \alias{plot.GO2}
 \alias{predict.GO2}
 \alias{spanodev}
@@ -15,8 +14,6 @@ GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
 
 GO2(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
   "binomial"), far = 10, ...)
-
-\method{plot}{GO1}(x, ...)
 
 \method{plot}{GO2}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)

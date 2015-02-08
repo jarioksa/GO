@@ -2,7 +2,6 @@
 
 S3method(anova,GO2)
 S3method(calibrate,GO2)
-S3method(plot,GO1)
 S3method(plot,GO2)
 S3method(predict,GO2)
 S3method(print,GO2)
