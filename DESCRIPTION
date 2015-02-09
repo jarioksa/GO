@@ -1,8 +1,10 @@
 Package: GO
 Title: Gaussian Ordination and Community Simulation
 Version: 0.1-0
-Authors@R: "Jari Oksanen <jari.oksanen@oulu.fi> [aut, cre]"
+Authors@R: person(given = "Jari", family = "Oksanen",
+                  role = c("cre","aut"),
+                  email = "jhoksane@gmail.com")
 Description: Package contains functions used to produce a manuscript on 
-  Gaussian Ordination
+  Gaussian Ordination.
 Imports: vegan, parallel
 License: GPL-2
