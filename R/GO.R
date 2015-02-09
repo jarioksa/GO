@@ -380,7 +380,7 @@ GO2 <-
     ## Check first if this should go to anova.GO2list
     dotargs <- list(...)
     if (length(dotargs)) {
-        isGO2 <- sapply(dotargs, function(z) inherits(z, "GO2"))
+        isGO2 <- sapply(dotargs, function(z) inherits(z, "GO"))
         dotargs <- dotargs[isGO2]
         if (length(dotargs))
             return(anova.GO2list(c(list(object), dotargs)))
@@ -556,10 +556,10 @@ GO2 <-
     bb <- b
     ## sanitize species scores: no extrapolation
     xx <- apply(object$points, 2, range)
-    bb[,1] <- ifelse(bb[,1] < xx[1,1], xx[1,1], bb[,1])
-    bb[,1] <- ifelse(bb[,1] > xx[2,1], xx[2,1], bb[,1])
-    bb[,2] <- ifelse(bb[,2] < xx[1,2], xx[1,2], bb[,2])
-    bb[,2] <- ifelse(bb[,2] > xx[2,2], xx[2,2], bb[,2])
+    for(i in seq_len(object$k)) {
+        bb[,i] <- ifelse(bb[,i] < xx[1,i], xx[1,i], bb[,i])
+        bb[,i] <- ifelse(bb[,i] > xx[2,i], xx[2,i], bb[,i])
+    }
     xmod <- wascores(bb, t(data))
     ##xmod <- wascores(b, t(data))
     ## Initialize as zero
