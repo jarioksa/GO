@@ -485,7 +485,9 @@ GO2 <-
     c(as.vector(x), as.vector(t(b)))
 }
 
-#' @param newdata New gradient locations for predicted responses
+#' @param newdata New gradient locations to \code{predict} species
+#' responses or new community data to \code{calibrate} gradient
+#' locations.
 #'
 #' @param type Predictions in the scale of responses or in the scale
 #' of link function.

@@ -64,7 +64,9 @@ other dimensions.}
 
 \item{mod1,mod2}{Compared result objects}
 
-\item{newdata}{New gradient locations for predicted responses}
+\item{newdata}{New gradient locations to \code{predict} species
+responses or new community data to \code{calibrate} gradient
+locations.}
 
 \item{type}{Predictions in the scale of responses or in the scale
 of link function.}
