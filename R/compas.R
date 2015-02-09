@@ -1,16 +1,23 @@
 #' Community Pattern Simulation
 #'
-#' Function \code{compas} generates simulated binary occurrence data
-#' from Gaussian response function. The species optima are distributed
-#' uniformly in the gradient space (plus \code{buffer}), the response
-#' heights are distributed uniformly in \eqn{(0,1)}, and the response
-#' widths are lognormally distributed with mean \eqn{t=1} and standard
-#' deviation as given in the function call. Function \code{betapas}
-#' generates similar responses from beta response function. The
-#' function first generates Gaussian species parameter, and then
-#' transforms these to beta response functions with varying shapes,
-#' but same optima and average height (occurrence probability) as the
-#' corresponding Gaussian response.
+#' Functions generate simulated binary occurrence data from Gaussian
+#' response (\code{compas}) or beta response functions
+#' (\code{betapas}).
+#'
+#' @details Function \code{compas} generates simulated data from
+#' Gaussian species response function with Bernoulli error. The
+#' species optima are distributed uniformly in the gradient space
+#' (plus \code{buffer}), the response heights are distributed
+#' uniformly in \eqn{(0,1)}, and the response widths are lognormally
+#' distributed with mean \eqn{t=1} and standard deviation as given in
+#' the function call.
+#'
+#' Function \code{betapas} generates data with Bernoulli error from
+#' beta response function. The function first generates Gaussian
+#' species parameters as in \code{compas}, and then transforms these
+#' to beta responses with the same optima and average heights
+#' (occurrence probability) as the corresponding Gaussian responses,
+#' but with varying shapes (skewness, kurtosis).
 #' 
 #' @param nsp Number of simulated species. Some species will not occur
 #' in any simulated sample and the number of species is usually lower
@@ -27,7 +34,7 @@
 #' regular grid. This argument will be used only if \code{x} was not
 #' given.
 #'
-#' #' @param buffer Buffer zone around the sampled gradient space for
+#' @param buffer Buffer zone around the sampled gradient space for
 #' simulated species optima.
 #'
 #' @param tsd Standard deviation of widths of species responses in
