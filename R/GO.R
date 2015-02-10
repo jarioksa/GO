@@ -171,12 +171,17 @@ GO1 <-
 #' @param far Threshold distance for species optima regarded as
 #' alien and frozen in fitting.
 #'
+#' @param init Initial configuration to start the iterations. This
+#' should be a matrix, and number of rows should match the community
+#' data, and number coluns the number of gradients (\code{k}). The
+#' default is to use scores from \code{\link[vegan]{decorana}}.
+#'
 #' @describeIn GO Simultaneous estimation of species parameters and
 #' gradient locations.
 #' @export
 GO2 <-
     function(comm, k = 1, tot = max(comm), freqlim = 5,
-             family = c("poisson", "binomial"), far = 10, ...)
+             family = c("poisson", "binomial"), far = 10, init, ...)
 {
     ## Limit to k <= 4
     if (k > 4)
@@ -205,13 +210,17 @@ GO2 <-
     mu.eta <- fam$mu.eta
     if (family != "binomial")
         tot <- 1
-    ## initialize gradient as DCA axes
-    x <- as.matrix(scores(decorana(comm), display = "sites", choices = 1:k))
     ## See if there are weights
     wts <- matrix(rep(tot, ncol(comm)), nrow(comm), ncol(comm))
     rwts <- wts[,1]
     comm <- comm / wts
     y <- as.matrix(comm)
+    ## initialize gradient as DCA axes, or if 'init' was given, use it
+    ## but normalize
+    if (missing(init))
+        x <- as.matrix(scores(decorana(comm), display = "sites", choices = 1:k))
+    else
+        x <- GOnormalize(comm, init, k=k, family=fam, w=rwts)
     ## initial estimates for species (these are "final" with the
     ## current 'x')
     mods <- lapply(comm, function(y) glm(y ~
@@ -462,27 +471,26 @@ GO2 <-
 ## tolerance = 1 for all species with unimodal responses and then
 ## estimates the glm parameters for normalized SU scores.
 `GOnormalize` <-
-    function(comm, p, k, tot, family, ...)
+    function(comm, x, k, family, w, ...)
 {
     ## extract SU scores from parameters p. When this function is
     ## evaluated for the first time, there are only these scores, but
     ## at later evaluation, there will be species parameters which
     ## will be ignored.
     n <- nrow(comm)
-    x <- matrix(p[1: (k*n)], nrow=n, ncol=k)
+    if (nrow(x) != n)
+        stop(gettextf("init should have %d rows, but has %d", n, nrow(x)))
+    if (ncol(x) != k)
+        stop(gettextf("init should have k=%d columns but has %d", k, ncol(x)))
     ## fit Gaussian response with free parameters
     b <- sapply(comm, function(y)
-                coef(glm(cbind(y, tot-y) ~ x + I(x^2), family = family)))
+        coef(glm(y ~ x + I(x^2), family = family,
+                 weights = w)))
     ## keep only negative 2nd degree coefficients
     b <- b[-(1:(k+1)),]
     b[b >= 0] <- NA
     scl <- rowMeans(sqrt(-1/2/b), na.rm=TRUE)
-    x <- sweep(x, 2, scl, "/")
-    ## fit Gaussian response with fixed tol=1
-    b <- sapply(comm, function(y)
-                coef(glm(cbind(y, tot-y) ~ x + offset(-0.5 * rowSums(x^2)),
-                         family = family)))
-    c(as.vector(x), as.vector(t(b)))
+    sweep(x, 2, scl, "/")
 }
 
 #' @param newdata New gradient locations to \code{predict} species

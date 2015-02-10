@@ -13,7 +13,7 @@
 GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
 
 GO2(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
-  "binomial"), far = 10, ...)
+  "binomial"), far = 10, init, ...)
 
 \method{plot}{GO}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)
@@ -46,6 +46,11 @@ be quoted).}
 
 \item{far}{Threshold distance for species optima regarded as
 alien and frozen in fitting.}
+
+\item{init}{Initial configuration to start the iterations. This
+should be a matrix, and number of rows should match the community
+data, and number coluns the number of gradients (\code{k}). The
+default is to use scores from \code{\link[vegan]{decorana}}.}
 
 \item{x}{Fitted model.}
 
