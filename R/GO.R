@@ -218,9 +218,9 @@ GO2 <-
     ## initialize gradient as DCA axes, or if 'init' was given, use it
     ## but normalize
     if (missing(init))
-        x <- as.matrix(scores(decorana(comm), display = "sites", choices = 1:k))
-    else
-        x <- GOnormalize(comm, init, k=k, family=fam, w=rwts)
+        init <- as.matrix(scores(decorana(comm), display = "sites",
+                                 choices = 1:k))
+    x <- GOnormalize(comm, init, k=k, family=fam, w=rwts)
     ## initial estimates for species (these are "final" with the
     ## current 'x')
     mods <- lapply(comm, function(y) glm(y ~
