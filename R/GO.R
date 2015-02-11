@@ -473,10 +473,7 @@ GO2 <-
 `GOnormalize` <-
     function(comm, x, k, family, w, ...)
 {
-    ## extract SU scores from parameters p. When this function is
-    ## evaluated for the first time, there are only these scores, but
-    ## at later evaluation, there will be species parameters which
-    ## will be ignored.
+    x <- scale(x, center = TRUE, scale = FALSE)
     n <- nrow(comm)
     if (nrow(x) != n)
         stop(gettextf("init should have %d rows, but has %d", n, nrow(x)))
