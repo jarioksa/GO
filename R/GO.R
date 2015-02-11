@@ -184,9 +184,8 @@ GO2 <-
              family = c("poisson", "binomial"), far = 10, init, ...)
 {
     ## Limit to k <= 4
-    if (k > 4)
-        stop(gettextf("Maximum allowed number of axes is 4, but you had k = %d",
-                      k))
+    if (missing(init) && k > 4)
+        stop(gettextf("max 'k=4' allowed if you have no 'init'"))
     ## Remove rare species
     freq <- colSums(comm > 0)
     comm <- comm[, freq >= freqlim]
@@ -473,18 +472,22 @@ GO2 <-
 `GOnormalize` <-
     function(comm, x, k, family, w, ...)
 {
+    ## centre 'x'
     x <- scale(x, center = TRUE, scale = FALSE)
+    ## check 'x'
     n <- nrow(comm)
     if (nrow(x) != n)
         stop(gettextf("init should have %d rows, but has %d", n, nrow(x)))
-    if (ncol(x) != k)
+    if (ncol(x) < k)
         stop(gettextf("init should have k=%d columns but has %d", k, ncol(x)))
+    if (ncol(x) > k)
+        x <- x[, seq_len(k), drop=FALSE]
     ## fit Gaussian response with free parameters
     b <- sapply(comm, function(y)
         coef(glm(y ~ x + I(x^2), family = family,
                  weights = w)))
     ## keep only negative 2nd degree coefficients
-    b <- b[-(1:(k+1)),]
+    b <- b[-(1:(k+1)),, drop = FALSE]
     b[b >= 0] <- NA
     scl <- rowMeans(sqrt(-1/2/b), na.rm=TRUE)
     sweep(x, 2, scl, "/")
