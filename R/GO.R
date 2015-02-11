@@ -21,7 +21,7 @@
 #'  The \code{plot} function displays fitted respose curves against one
 #'  ordination axis. In principle, the ordination can be rotated using 
 #'  \pkg{vegan} function \code{\link[vegan]{MDSrotate}}, but this requires
-#'  a version that agrees to analyse \code{GO2} results. Traditional 
+#'  a version that agrees to analyse \code{GO} results. Traditional 
 #'  ordination plots of SU scores and species optima can be displayed
 #'  with \code{\link[vegan]{ordiplot}} (\pkg{vegan} package). The function
 #'  is written so that several other \pkg{vegan} and standard \R functions 
@@ -32,7 +32,7 @@
 #' @examples
 #' library(vegan) ## *must* be given before using the function
 #' data(varespec)
-#' mod <- GO2(varespec, k=2, far=5, tot=100, family="binomial", iterlim=1000)
+#' mod <- GO(varespec, k=2, far=5, tot=100, family="binomial", iterlim=1000)
 #' plot(mod, label=TRUE)
 #' ordiplot(mod, type="t")
 #' ordiplot(mod, dis="si", type="t")
@@ -58,7 +58,7 @@
 #'
 #' @param parallel Number of parallel processes.
 #'
-#' @param \dots Other parameters passed to functions. In \code{GO2}
+#' @param \dots Other parameters passed to functions. In \code{GO}
 #' these are passed to \code{\link{nlm}} and can include, e.g.,
 #' \code{iterlim} (which often must be set to higher value than the
 #' default 100).
@@ -151,7 +151,7 @@ GO1 <-
     out
 }
 
-### GO2 tries to estimate species parameters and Gaussian axis
+### GO tries to estimate species parameters and Gaussian axis
 ### simultaneously instead of alternating between estimating Gaussian
 ### axis and fitting species to the current estimate of the axis. This
 ### may be hard, but avoids slow glm() steps and can easily be
@@ -179,7 +179,7 @@ GO1 <-
 #' @describeIn GO Simultaneous estimation of species parameters and
 #' gradient locations.
 #' @export
-GO2 <-
+GO <-
     function(comm, k = 1, tot = max(comm), freqlim = 5,
              family = c("poisson", "binomial"), far = 10, init, ...)
 {
@@ -385,13 +385,13 @@ GO2 <-
 `anova.GO` <-
     function(object, ...)
 {
-    ## Check first if this should go to anova.GO2list
+    ## Check first if this should go to anova.GOlist
     dotargs <- list(...)
     if (length(dotargs)) {
-        isGO2 <- sapply(dotargs, function(z) inherits(z, "GO"))
-        dotargs <- dotargs[isGO2]
+        isGO <- sapply(dotargs, function(z) inherits(z, "GO"))
+        dotargs <- dotargs[isGO]
         if (length(dotargs))
-            return(anova.GO2list(c(list(object), dotargs)))
+            return(anova.GOlist(c(list(object), dotargs)))
     }
     Df <- object$df.null - object$df.residual
     Dev <- object$null.deviance - object$deviance
@@ -409,7 +409,7 @@ GO2 <-
     out
 }
 
-`anova.GO2list` <-
+`anova.GOlist` <-
     function(object, ...)
 {
     nmodels <- length(object)
@@ -532,7 +532,7 @@ GO2 <-
 
 ### The calibrate function finds the most likely gradient position
 ### (location of 'points') given the observed community composition
-### and the fitted GO2 model.
+### and the fitted GO model.
 
 #' @importFrom vegan calibrate wascores
 #' 

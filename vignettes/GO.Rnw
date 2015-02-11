@@ -292,7 +292,7 @@ implements alternate non-linear estimation of gradient values $x$ and
 GLM estimation of species parameters $a, b$. The user interfaces are:
 <<>>=
 args(GO1)
-args(GO2)
+args(GO)
 @ 
 Both of these functions share some arguments:
 \begin{itemize}
@@ -306,7 +306,7 @@ Both of these functions share some arguments:
 Function \code{GO1} is so far implemented only for one
 dimension. Because it uses the alternating non-linear and GLM fitting,
 it can use parallel processing in the evaluation (\code{parallel}
-gives the number of desired parallel processes). Function \code{GO2}
+gives the number of desired parallel processes). Function \code{GO}
 can fit multidimensional models, and parameter \code{k} gives the
 number of axes. Currently \code{k} is limited to 4 axes, but there is
 no particularly compelling reason to impose this limit\,--\,I only
@@ -316,17 +316,17 @@ in these functions, and we shall set higher iteration limits with
 \code{iterlim}. 
 
 \code{GO1} is currently only available for one dimension, and it is
-very slow, and therefore we use only \code{GO2}. Let us first evaluate
+very slow, and therefore we use only \code{GO}. Let us first evaluate
 models for one to three dimensions:
 <<>>=
 data(varespec)
-system.time(m1 <- GO2(varespec, k=1, freqlim=10, tot=100, iterlim=1000))
-system.time(m2 <- GO2(varespec, k=2, freqlim=10, tot=100, iterlim=1000))
-system.time(m3 <- GO2(varespec, k=3, freqlim=10, tot=100, iterlim=1000))
+system.time(m1 <- GO(varespec, k=1, freqlim=10, tot=100, iterlim=1000))
+system.time(m2 <- GO(varespec, k=2, freqlim=10, tot=100, iterlim=1000))
+system.time(m3 <- GO(varespec, k=3, freqlim=10, tot=100, iterlim=1000))
 @ 
 I have written some method functions that can be used with the result:
 <<>>=
-methods(class="GO2")
+methods(class="GO")
 @ 
 For instance, there is a \code{print} method so that we get a brief
 overview of the result (and typing the name of the object implicitly
@@ -357,16 +357,16 @@ will see here are functions are \code{ordiplot}, \code{enfvit},
 I have made a specific \code{plot} function that displays the
 responses against gradients (Fig.~\ref{fig:plotm1}).
 \begin{figure}
-  \subfigure[a]{\includegraphics[width=0.5\linewidth]{GO-plot-GO2}}%
+  \subfigure[a]{\includegraphics[width=0.5\linewidth]{GO-plot-GO}}%
   \subfigure[b]{\includegraphics[width=0.5\linewidth]{GO-ordiplot-stack}}
   \caption{One-dimensional Gaussian Ordination. \textbf{a} Dedicated
-    \code{plot} function of \code{GO2} showing fitted Gaussian
+    \code{plot} function of \code{GO} showing fitted Gaussian
     responses against the gradient. \textbf{b} Standard \pkg{vegan}
     ordination plot (\code{ordiplot}) which for one-axis models
     defaults to a stacked line.}
   \label{fig:plotm1}
 \end{figure}
-<<plot-GO2,fig=TRUE,include=FALSE>>=
+<<plot-GO,fig=TRUE,include=FALSE>>=
 plot(m1, label = TRUE)
 @ 
 For multi-axis models this will display a line through origin with
@@ -375,7 +375,7 @@ the height of the curve would be the same on all gradients, but the
 default is a gradient line through the origin. 
 
 For a classical ordination plot, we can use \pkg{vegan}
-\code{ordiplot} function that is able to handle \code{GO2} results
+\code{ordiplot} function that is able to handle \code{GO} results
 (Fig.~\ref{fig:plotm1}).
 <<ordiplot-stack,fig=TRUE,include=FALSE>>=
 ordiplot(m1)
@@ -418,7 +418,7 @@ ordisurf(m2 ~ scores(m1), bubble=3)
 plot(envfit(m2 ~ scores(m1)), label="Dim1")
 @ 
 As you see, \pkg{vegan} functions \code{ordisurf}, \code{envfit}
-and \code{scores} are can handle \code{GO2} results.
+and \code{scores} are can handle \code{GO} results.
 
 \subsection{Other methods}
 
@@ -477,7 +477,7 @@ coefficient, and plot the results over the canonical fit
   \label{fig:freefit}
 \end{figure}
 <<freefit,fig=TRUE,include=FALSE>>=
-## take the same subset of species as used in GO2
+## take the same subset of species as used in GO
 v10 <- varespec[, colSums(varespec>0) >= 10]
 ## the gradient
 ax <- drop(scores(m1))
@@ -634,7 +634,7 @@ let us have a look at the problems:
 \end{figure}
 <<dune-resp,fig=TRUE,include=FALSE>>=
 data(dune)
-mdu1 <- GO2(dune, k=1, iterlim=1000)
+mdu1 <- GO(dune, k=1, iterlim=1000)
 mdu1
 plot(mdu1, label=TRUE)
 @ 
@@ -672,7 +672,7 @@ problematic since here the method should have worked: GO of
 Mt.\,Field. 
 
 I intended to send you brief overview of my experiments last Sunday,
-but then light mindedly decided to also run a GO2 on the full
+but then light mindedly decided to also run a GO on the full
 Mt.\,Field data set: all 398\,SUs, but only 127 most common species
 (frequency\,$\ge 10$). My 1.6\,GHz laptop finished the analysis on
 Tuesday evening, and I  closed the lid only when we drove from

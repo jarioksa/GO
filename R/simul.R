@@ -33,7 +33,7 @@
         savecomm <<- comm
         print(summary(specnumber(comm)))
         cat("total (gamma):", ncol(comm), "\n")
-        mgo <- GO2(comm, k=2, family="binomial", tot=1, far=4, iterlim=1000)
+        mgo <- GO(comm, k=2, family="binomial", tot=1, far=4, iterlim=1000)
         mmds <- metaMDS(comm, maxit=500, sratmax=0.999999)
         mca <- cca(comm)
         mdca <- decorana(comm)
