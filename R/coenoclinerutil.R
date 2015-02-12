@@ -47,5 +47,6 @@
 `DropMissingSpec` <-
     function(comm)
 {
+    colnames(comm) <- paste0("sp", seq_along(ncol(comm)))
     comm[, colSums(comm) > 0]
 }
