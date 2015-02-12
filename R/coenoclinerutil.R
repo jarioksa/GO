@@ -33,9 +33,9 @@
     ## uniform opt in range +/- buffer
     ux <- runif(nsp, -xrange/2 - buffer, xrange/2 + buffer)
     uy <- runif(nsp, -yrange/2 - buffer, yrange/2 + buffer)
-    ## lognormal t
-    tx <- rlnorm(nsp, 0, tsd)
-    ty <- rlnorm(nsp, 0, tsd)
+    ## lognormal tol. Mean of lognormal is exp(tsd^2/2)
+    tx <- rlnorm(nsp, -tsd^2/2, tsd)
+    ty <- rlnorm(nsp, -tsd^2/2, tsd)
     list(px = cbind("opt" = ux, "tol" = tx, "h" = h),
          py = cbind("opt" = uy, "tol" = ty))
 }
