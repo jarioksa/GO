@@ -27,9 +27,13 @@
 {
     ## Create Gaussian parameters for Binomial responses to be used
     ## with coenocliner
+
+    ## uniform h in (0,1)
     h <- runif(nsp)
+    ## uniform opt in range +/- buffer
     ux <- runif(nsp, -xrange/2 - buffer, xrange/2 + buffer)
     uy <- runif(nsp, -yrange/2 - buffer, yrange/2 + buffer)
+    ## lognormal t
     tx <- rlnorm(nsp, 0, tsd)
     ty <- rlnorm(nsp, 0, tsd)
     list(px = cbind("opt" = ux, "tol" = tx, "h" = h),
@@ -45,5 +49,3 @@
 {
     comm[, colSums(comm) > 0]
 }
-    
-
