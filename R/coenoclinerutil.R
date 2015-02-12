@@ -68,10 +68,20 @@
     ## modal abundance at Gaussian opt
     mx <- gausspar$px[,"opt"]
     my <- gausspar$py[,"opt"]
-    ## Same height as the Gaussian response: should be the same
-    ## integral so that beta and Gaussian predict the same number of
-    ## occurrences
-    A0 <- gausspar$px[,"h"]
+    ## Response height A0 should be such that beta response has the
+    ## same mass as the corresponding Gaussian. The integral of
+    ## univariate Gaussian response is h*t*sqrt(2*pi) and the integral
+    ## of beta response is adj*range*beta(alpha+1, gamma+1), and we
+    ## need to find A0 giving the desired height adjustment adj, and
+    ## here beta() is the real mathematical beta function. However, we
+    ## do not want A0>1 because we target Binomial models.
+    Gmass <- with(gausspar, px[,"h"] * px[,"tol"] * py[,"tol"] * 2 * pi)
+    Bmass <- rx * ry * beta(ax+1, gx+1) * beta(ay+1, gy+1)
+    adj <- Gmass/Bmass
+    ## bx, by and A0 come from Minchin, Vegetation 71, 145-156 (1987).
+    bx <- ax/(ax+gx)
+    by <- ay/(ay+gy)
+    A0 <- pmin(adj * bx^ax * (1-bx)^gx * by^ay * (1-by)^gy, 1)
     ## collect
     list(px = cbind("m" = mx, "r" = rx, "alpha" = ax, "gamma" = gx, "A0" = A0),
          py = cbind("m" = my, "r" = ry, "alpha" = ay, "gamma" = gy))
