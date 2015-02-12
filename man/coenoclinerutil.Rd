@@ -3,12 +3,15 @@
 \name{GradLocs}
 \alias{BinomGaussPar}
 \alias{DropMissingSpec}
+\alias{Gauss2betaPar}
 \alias{GradLocs}
 \title{Utility Functions for 'coenocliner' Package}
 \usage{
 GradLocs(n, xrange, yrange)
 
 BinomGaussPar(nsp, xrange, yrange, buffer = 2, tsd = 0.1)
+
+Gauss2betaPar(gausspar, shape = c(0.5, 6.5), range = 5)
 
 DropMissingSpec(comm)
 }
@@ -24,6 +27,15 @@ DropMissingSpec(comm)
 \item{tsd}{Standard deviation of tolerance in log-Normal
 distribution, in log scale}
 
+\item{gausspar}{Gaussian response parameters for species as
+returned by \code{BinomGaussPar}.}
+
+\item{shape}{Random uniform range of shape parameters \eqn{alpha}
+and \eqn{gamma} of response function}
+
+\item{range}{Range of beta response in $t$ (\sQuote{sd}) units of
+Gaussian response function.}
+
 \item{comm}{Community data.}
 }
 \description{
@@ -37,6 +49,9 @@ package.
 \item \code{GradLocs}: Gradient Locations
 
 \item \code{BinomGaussPar}: Gaussian Parameters for Binomial Response.
+
+\item \code{Gauss2betaPar}: Translate Gaussian parameters into
+corresponding beta response parameters.
 
 \item \code{DropMissingSpec}: Drop missing species from the data.
 }}
