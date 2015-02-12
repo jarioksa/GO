@@ -42,7 +42,7 @@
 
 #' @param gausspar Gaussian response parameters for species as
 #' returned by \code{BinomGaussPar}.
-#' @param shape Random uniform range of shape parameters \eqn{alpha}
+#' @param shape Random log-uniform range of shape parameters \eqn{alpha}
 #' and \eqn{gamma} of response function
 #' @param range Range of beta response in $t$ (\sQuote{sd}) units of
 #' Gaussian response function.
@@ -58,10 +58,11 @@
     ## from BinomGausPar. This is not checked.
     nsp <- nrow(gausspar[[1]])
     ## shapes uniform in (shape)
-    ax <- runif(nsp, shape[1], shape[2])
-    gx <- runif(nsp, shape[1], shape[2])
-    ay <- runif(nsp, shape[1], shape[2])
-    gy <- runif(nsp, shape[1], shape[2])
+    shape <- log(shape)
+    ax <- exp(runif(nsp, shape[1], shape[2]))
+    gx <- exp(runif(nsp, shape[1], shape[2]))
+    ay <- exp(runif(nsp, shape[1], shape[2]))
+    gy <- exp(runif(nsp, shape[1], shape[2]))
     ## ranges a multiple of Gaussian tol
     rx <- range * gausspar$px[,"tol"]
     ry <- range * gausspar$py[,"tol"]

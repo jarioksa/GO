@@ -30,7 +30,7 @@ distribution, in log scale}
 \item{gausspar}{Gaussian response parameters for species as
 returned by \code{BinomGaussPar}.}
 
-\item{shape}{Random uniform range of shape parameters \eqn{alpha}
+\item{shape}{Random log-uniform range of shape parameters \eqn{alpha}
 and \eqn{gamma} of response function}
 
 \item{range}{Range of beta response in $t$ (\sQuote{sd}) units of
