@@ -78,7 +78,8 @@
     Gmass <- with(gausspar, px[,"h"] * px[,"tol"] * py[,"tol"] * 2 * pi)
     Bmass <- rx * ry * beta(ax+1, gx+1) * beta(ay+1, gy+1)
     adj <- Gmass/Bmass
-    ## bx, by and A0 come from Minchin, Vegetation 71, 145-156 (1987).
+    ## bx, by and A0 are from Minchin, Vegetatio 71, 145-156 (1987),
+    ## and they are similarly used in coenocliner.
     bx <- ax/(ax+gx)
     by <- ay/(ay+gy)
     A0 <- pmin(adj * bx^ax * (1-bx)^gx * by^ay * (1-by)^gy, 1)
