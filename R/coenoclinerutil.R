@@ -3,6 +3,18 @@
 #' Functions to automated simulation routines using \pkg{coenocliner}
 #' package.
 #'
+#' @examples
+#' if (require(coenocliner)) {
+#' gp <- BinomGaussPar(400, 6, 2)
+#' bp <- Gauss2betaPar(gp)
+#' xy62 <- GradLocs(100, 6, 2)
+#' xy31 <- GradLocs(100, 3, 1)
+#' coenorun1(coenocline(xy62, "gaussian", gp, countModel="bernoulli"), xy62)
+#' coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"), xy31)
+#' coenorun1(coenocline(xy62, "beta", bp, countModel="bernoulli"), xy62)
+#' coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"), xy31)
+#' }
+#'
 #' @param n Number of SUs.
 #' @param xrange,yrange Desired range of gradients.
 #'
@@ -96,6 +108,37 @@
 `DropMissingSpec` <-
     function(comm)
 {
-    colnames(comm) <- paste0("sp", seq_along(ncol(comm)))
+    colnames(comm) <- paste0("sp", seq_len(ncol(comm)))
     comm[, colSums(comm) > 0]
 }
+
+#' @importFrom vegan metaMDS cca decorana procrustes
+#' @param sim One simulated community.
+#' @param locs True gradient locations.
+#' @param tot Binomial total in \code{sim}.
+#'
+#' @describeIn coenoclinerutil Takes one simulated community for
+#' ordination with GO, NMDS, CA and DCA and returns average Procrustes
+#' precision
+#'
+#' @export
+`coenorun1` <-
+    function(sim, locs, tot=1)
+{
+    n <- nrow(locs)
+    sim <- as.data.frame(DropMissingSpec(sim))
+    out <- rep(NA, 4)
+    names(out) <- c("GO", "NMDS", "CA", "DCA")
+    ## GO can fail
+    mgo <- try(GO(sim, k=2, family="binomial", tot=tot, far=4, iterlim=1000))
+    mmds <- metaMDS(sim, maxit=500, sratmax=0.999999, trace=0)
+    mca <- cca(sim)
+    mdca <- decorana(sim)
+    if (!inherits(mgo, "try-error"))
+        out["GO"] <- sqrt(procrustes(locs, mgo)$ss/n)
+    out["NMDS"] <- sqrt(procrustes(locs, mmds)$ss/n)
+    out["CA"] <- sqrt(procrustes(locs, mca)$ss/n)
+    out["DCA"] <- sqrt(procrustes(locs, mdca)$ss/n)
+    out
+}
+

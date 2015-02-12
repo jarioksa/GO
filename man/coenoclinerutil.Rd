@@ -5,6 +5,7 @@
 \alias{DropMissingSpec}
 \alias{Gauss2betaPar}
 \alias{GradLocs}
+\alias{coenorun1}
 \title{Utility Functions for 'coenocliner' Package}
 \usage{
 GradLocs(n, xrange, yrange)
@@ -14,6 +15,8 @@ BinomGaussPar(nsp, xrange, yrange, buffer = 2, tsd = 0.1)
 Gauss2betaPar(gausspar, shape = c(0.5, 6.5), range = 5)
 
 DropMissingSpec(comm)
+
+coenorun1(sim, locs, tot = 1)
 }
 \arguments{
 \item{n}{Number of SUs.}
@@ -37,6 +40,12 @@ and \eqn{gamma} of response function}
 Gaussian response function.}
 
 \item{comm}{Community data.}
+
+\item{sim}{One simulated community.}
+
+\item{locs}{True gradient locations.}
+
+\item{tot}{Binomial total in \code{sim}.}
 }
 \description{
 Functions to automated simulation routines using \pkg{coenocliner}
@@ -54,5 +63,21 @@ package.
 corresponding beta response parameters.
 
 \item \code{DropMissingSpec}: Drop missing species from the data.
+
+\item \code{coenorun1}: Takes one simulated community for
+ordination with GO, NMDS, CA and DCA and returns average Procrustes
+precision
 }}
+\examples{
+if (require(coenocliner)) {
+gp <- BinomGaussPar(400, 6, 2)
+bp <- Gauss2betaPar(gp)
+xy62 <- GradLocs(100, 6, 2)
+xy31 <- GradLocs(100, 3, 1)
+coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"), xy62)
+coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"), xy31)
+coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"), xy62)
+coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"), xy31)
+}
+}
 
