@@ -48,6 +48,18 @@
     ## lognormal tol. Mean of lognormal is exp(tsd^2/2)
     tx <- rlnorm(nsp, -tsd^2/2, tsd)
     ty <- rlnorm(nsp, -tsd^2/2, tsd)
+    ## Order species centrifugally by their expected abundance at the
+    ## origin. First species should be present in most simulations,
+    ## even with short gradient spans, and last species are either
+    ## globally rare or found only with longest gradients spanning the
+    ## whole species space.
+    i <- rev(order(-(ux/tx)^2 - (uy/ty)^2 + 2*log(h)))
+    h <- h[i]
+    ux <- ux[i]
+    tx <- tx[i]
+    uy <- uy[i]
+    ty <- ty[i]
+    ## out
     list(px = cbind("opt" = ux, "tol" = tx, "h" = h),
          py = cbind("opt" = uy, "tol" = ty))
 }
