@@ -126,7 +126,7 @@
     function(sim, locs, tot=1)
 {
     n <- nrow(locs)
-    sim <- as.data.frame(DropMissingSpec(sim))
+    sim <- DropMissingSpec(sim)
     out <- rep(NA, 4)
     names(out) <- c("GO", "NMDS", "CA", "DCA")
     ## GO can fail

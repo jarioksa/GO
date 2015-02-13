@@ -69,6 +69,7 @@
 GO1 <-
     function(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
 {
+    comm <- as.data.frame(comm)
     ## do parallel?
     if(parallel > 1) {
         clu <- makeCluster(parallel)
@@ -183,6 +184,7 @@ GO <-
     function(comm, k = 1, tot = max(comm), freqlim = 5,
              family = c("poisson", "binomial"), far = 10, init, ...)
 {
+    comm <- as.data.frame(comm)
     ## Limit to k <= 4
     if (missing(init) && k > 4)
         stop(gettextf("max 'k=4' allowed if you have no 'init'"))
