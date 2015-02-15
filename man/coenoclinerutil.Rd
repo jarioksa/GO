@@ -80,4 +80,7 @@ xy <- replicate(nsim, GradLocs(npoints, 3, 2))
 sapply(seq_len(nsim), function(i)
      coenocline(xy[,,i], "gaussian", sp[,i], countModel="bernoulli"))
 }
+\author{
+Jari Oksanen
+}
 

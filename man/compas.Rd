@@ -65,4 +65,7 @@ but with varying shapes (skewness, kurtosis).
 
 \item \code{betapas}: Simulation with beta response functions.
 }}
+\author{
+Jari Oksanen
+}
 

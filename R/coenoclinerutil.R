@@ -3,6 +3,8 @@
 #' Functions to automated simulation routines using \pkg{coenocliner}
 #' package.
 #'
+#' @author Jari Oksanen
+#'
 #' @examples
 #' require(coenocliner) || stop("examples need 'coenocliner' package") 
 #' ## small simulation

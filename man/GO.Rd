@@ -133,6 +133,9 @@ anova(mod1, mod)
 spanodev(mod1)
 spanodev(mod1, mod)
 }
+\author{
+Jari Oksanen
+}
 \seealso{
 \code{\link[VGAM]{cgo}} in \pkg{VGAM} package.
 }

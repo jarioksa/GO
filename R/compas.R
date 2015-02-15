@@ -18,7 +18,9 @@
 #' to beta responses with the same optima and average heights
 #' (occurrence probability) as the corresponding Gaussian responses,
 #' but with varying shapes (skewness, kurtosis).
-#' 
+#'
+#' @author Jari Oksanen
+#'
 #' @param nsp Number of simulated species. Some species will not occur
 #' in any simulated sample and the number of species is usually lower
 #' in simulation results.

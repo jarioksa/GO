@@ -27,6 +27,8 @@
 #'  is written so that several other \pkg{vegan} and standard \R functions 
 #'  can handle results.
 #'
+#' @author Jari Oksanen
+#' 
 #' @seealso \code{\link[VGAM]{cgo}} in \pkg{VGAM} package.
 #'
 #' @examples
