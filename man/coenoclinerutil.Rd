@@ -16,7 +16,7 @@ Gauss2betaPar(gausspar, shape = c(0.5, 6.5), range = 5)
 
 DropMissingSpec(comm)
 
-coenorun1(sim, locs, tot = 1)
+coenorun1(sim, tot = 1)
 }
 \arguments{
 \item{n}{Number of SUs.}
@@ -42,8 +42,6 @@ Gaussian response function.}
 \item{comm}{Community data.}
 
 \item{sim}{One simulated community.}
-
-\item{locs}{True gradient locations.}
 
 \item{tot}{Binomial total in \code{sim}.}
 }
@@ -74,10 +72,10 @@ gp <- BinomGaussPar(400, 6, 2)
 bp <- Gauss2betaPar(gp)
 xy62 <- GradLocs(100, 6, 2)
 xy31 <- GradLocs(100, 3, 1)
-coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"), xy62)
-coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"), xy31)
-coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"), xy62)
-coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"), xy31)
+coenorun1(coenocline(xy62, "gaussian", gp, countModel="bernoulli"))
+coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"))
+coenorun1(coenocline(xy62, "beta", bp, countModel="bernoulli"))
+coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"))
 }
 }
 
