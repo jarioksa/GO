@@ -120,8 +120,13 @@
 `DropMissingSpec` <-
     function(comm)
 {
+    cl <- class(comm)
+    locs <- locations(comm)
     colnames(comm) <- paste0("sp", seq_len(ncol(comm)))
-    comm[, colSums(comm) > 0]
+    comm <- comm[, colSums(comm) > 0]
+    attr(comm, "locations") <- locs
+    class(comm) <- cl
+    comm
 }
 
 #' @importFrom vegan metaMDS cca decorana procrustes
