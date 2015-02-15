@@ -129,7 +129,7 @@
     comm
 }
 
-#' @importFrom vegan metaMDS cca decorana procrustes
+#' @importFrom vegan metaMDS cca decorana procrustes specnumber
 #' @param sim One simulated community.
 #' @param tot Binomial total in \code{sim}.
 #'
@@ -144,8 +144,8 @@
     locs <- locations(sim)
     n <- nrow(locs)
     sim <- DropMissingSpec(sim)
-    out <- rep(NA, 4)
-    names(out) <- c("GO", "NMDS", "CA", "DCA")
+    out <- rep(NA, 6)
+    names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
     ## GO can fail
     mgo <- try(GO(sim, k=2, family="binomial", tot=tot, far=4, iterlim=1000))
     mmds <- metaMDS(sim, maxit=500, sratmax=0.999999, trace=0)
@@ -156,6 +156,9 @@
     out["NMDS"] <- sqrt(procrustes(locs, mmds)$ss/n)
     out["CA"] <- sqrt(procrustes(locs, mca)$ss/n)
     out["DCA"] <- sqrt(procrustes(locs, mdca, choices=1:2)$ss/n)
+    ## richness statistics
+    out["gamma"] <- ncol(sim)
+    out["alpha"] <- mean(specnumber(sim))
     out
 }
 
