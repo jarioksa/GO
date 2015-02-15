@@ -78,7 +78,8 @@ xy <- replicate(nsim, GradLocs(npoints, 3, 2))
 ## Simulations: these can be easily parallelized using mclapply
 ## (Linux, Mac) or parSapply (all).
 sapply(seq_len(nsim), function(i)
-     coenocline(xy[,,i], "gaussian", sp[,i], countModel="bernoulli"))
+     coenorun1(coenocline(xy[,,i], "gaussian", sp[,i],
+         countModel="bernoulli")))
 }
 \author{
 Jari Oksanen

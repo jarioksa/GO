@@ -17,7 +17,8 @@
 #' ## Simulations: these can be easily parallelized using mclapply
 #' ## (Linux, Mac) or parSapply (all).
 #' sapply(seq_len(nsim), function(i)
-#'      coenocline(xy[,,i], "gaussian", sp[,i], countModel="bernoulli"))
+#'      coenorun1(coenocline(xy[,,i], "gaussian", sp[,i],
+#'          countModel="bernoulli")))
 #'
 #' @param n Number of SUs.
 #' @param xrange,yrange Desired range of gradients.
