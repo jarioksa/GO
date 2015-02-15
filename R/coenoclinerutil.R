@@ -5,14 +5,17 @@
 #'
 #' @examples
 #' if (require(coenocliner)) {
-#' gp <- BinomGaussPar(400, 6, 2)
-#' bp <- Gauss2betaPar(gp)
-#' xy62 <- GradLocs(100, 6, 2)
-#' xy31 <- GradLocs(100, 3, 1)
-#' coenorun1(coenocline(xy62, "gaussian", gp, countModel="bernoulli"))
-#' coenorun1(coenocline(xy31, "gaussian", gp, countModel="bernoulli"))
-#' coenorun1(coenocline(xy62, "beta", bp, countModel="bernoulli"))
-#' coenorun1(coenocline(xy31, "beta", bp, countModel="bernoulli"))
+#' ## small simulation
+#' nsim <- 10
+#' npoints <- 50
+#' ## generate a set of species parameters over the maximum extent
+#' sp <- replicate(nsim, BinomGaussPar(800, 8, 4))
+#' ## sample much narrower proportion of the space
+#' xy <- replicate(nsim, GradLocs(npoints, 3, 2))
+#' ## Simulations: these can be easily parallelized using mclapply
+#' ## (Linux, Mac) or parSapply (all).
+#' sapply(seq_len(nsim), function(i)
+#'      coenocline(xy[,,i], "gaussian", sp[,i], countModel="bernoulli"))
 #' }
 #'
 #' @param n Number of SUs.
