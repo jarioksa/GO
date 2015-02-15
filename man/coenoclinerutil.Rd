@@ -67,7 +67,7 @@ ordination with GO, NMDS, CA and DCA and returns average Procrustes
 precision
 }}
 \examples{
-if (require(coenocliner)) {
+require(coenocliner) || stop("examples need 'coenocliner' package")
 ## small simulation
 nsim <- 10
 npoints <- 50
@@ -79,6 +79,5 @@ xy <- replicate(nsim, GradLocs(npoints, 3, 2))
 ## (Linux, Mac) or parSapply (all).
 sapply(seq_len(nsim), function(i)
      coenocline(xy[,,i], "gaussian", sp[,i], countModel="bernoulli"))
-}
 }
 

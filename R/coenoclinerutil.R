@@ -4,7 +4,7 @@
 #' package.
 #'
 #' @examples
-#' if (require(coenocliner)) {
+#' require(coenocliner) || stop("examples need 'coenocliner' package") 
 #' ## small simulation
 #' nsim <- 10
 #' npoints <- 50
@@ -16,7 +16,6 @@
 #' ## (Linux, Mac) or parSapply (all).
 #' sapply(seq_len(nsim), function(i)
 #'      coenocline(xy[,,i], "gaussian", sp[,i], countModel="bernoulli"))
-#' }
 #'
 #' @param n Number of SUs.
 #' @param xrange,yrange Desired range of gradients.
@@ -133,6 +132,7 @@
 }
 
 #' @importFrom vegan metaMDS cca decorana procrustes specnumber
+#' @importFrom coenocliner locations
 #' @param sim One simulated community.
 #' @param tot Binomial total in \code{sim}.
 #'

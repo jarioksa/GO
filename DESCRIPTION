@@ -6,6 +6,5 @@ Authors@R: person(given = "Jari", family = "Oksanen",
                   email = "jhoksane@gmail.com")
 Description: Package contains functions used to produce a manuscript on 
   Gaussian Ordination.
-Suggests: coenocliner
-Imports: vegan, parallel
+Imports: vegan, parallel, coenocliner (>= 0.2-0)
 License: GPL-2
