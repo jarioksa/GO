@@ -154,7 +154,10 @@
     names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
     ## GO can fail
     mgo <- try(GO(sim, k=2, family="binomial", tot=tot, far=4, iterlim=1000))
-    mmds <- metaMDS(sim, maxit=500, sratmax=0.999999, trace=0)
+    if (inherits(mgo, "try-error"))
+        mgo <- try(GO(sim, k=2, family="binomial", tot=tot, far=4, iterlim=1000,
+                      init = matrix(runif(2*n), ncol=2)))
+    mmds <- metaMDS(sim, maxit=500, trymax=200, sratmax=0.999999, trace=0)
     mca <- cca(sim)
     mdca <- decorana(sim)
     if (!inherits(mgo, "try-error"))
