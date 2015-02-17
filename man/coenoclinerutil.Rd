@@ -16,7 +16,7 @@ Gauss2betaPar(gausspar, shape = c(0.5, 6.5), range = 5)
 
 DropMissingSpec(comm)
 
-coenorun1(sim, tot = 1)
+coenorun1(sim, tot = 1, family = "binomial", far = 4)
 }
 \arguments{
 \item{n}{Number of SUs.}
@@ -44,6 +44,10 @@ Gaussian response function.}
 \item{sim}{One simulated community.}
 
 \item{tot}{Binomial total in \code{sim}.}
+
+\item{family}{Error family passed to \code{\link{GO}}.}
+
+\item{far}{Weirdness limit passed to \code{\link{GO}}.}
 }
 \description{
 Functions to automated simulation routines using \pkg{coenocliner}

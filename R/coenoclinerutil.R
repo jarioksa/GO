@@ -138,14 +138,15 @@
 #' @importFrom coenocliner locations
 #' @param sim One simulated community.
 #' @param tot Binomial total in \code{sim}.
-#'
+#' @param family Error family passed to \code{\link{GO}}.
+#' @param far Weirdness limit passed to \code{\link{GO}}.
 #' @describeIn coenoclinerutil Takes one simulated community for
 #' ordination with GO, NMDS, CA and DCA and returns average Procrustes
 #' precision
 #'
 #' @export
 `coenorun1` <-
-    function(sim, tot=1)
+    function(sim, tot=1, family = "binomial", far=4)
 {
     locs <- locations(sim)
     n <- nrow(locs)
@@ -153,9 +154,9 @@
     out <- rep(NA, 6)
     names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
     ## GO can fail
-    mgo <- try(GO(sim, k=2, family="binomial", tot=tot, far=4, iterlim=1000))
+    mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000))
     if (inherits(mgo, "try-error"))
-        mgo <- try(GO(sim, k=2, family="binomial", tot=tot, far=4, iterlim=1000,
+        mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
                       init = matrix(runif(2*n), ncol=2)))
     mmds <- metaMDS(sim, maxit=500, trymax=200, sratmax=0.999999, trace=0)
     mca <- cca(sim)
