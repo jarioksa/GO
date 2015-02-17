@@ -164,7 +164,7 @@
     if (!inherits(mgo, "try-error"))
         out["GO"] <- sqrt(procrustes(locs, mgo)$ss/n)
     out["NMDS"] <- sqrt(procrustes(locs, mmds)$ss/n)
-    out["CA"] <- sqrt(procrustes(locs, mca)$ss/n)
+    out["CA"] <- sqrt(procrustes(locs, mca, scaling=1)$ss/n)
     out["DCA"] <- sqrt(procrustes(locs, mdca, choices=1:2)$ss/n)
     ## richness statistics
     out["gamma"] <- ncol(sim)
