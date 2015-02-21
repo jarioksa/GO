@@ -1,10 +1,10 @@
 Package: GO
 Title: Gaussian Ordination and Community Simulation
-Version: 0.2-0
+Version: 0.3-0
 Authors@R: person(given = "Jari", family = "Oksanen",
                   role = c("cre","aut"),
                   email = "jhoksane@gmail.com")
-Description: Package contains functions used to produce a manuscript on 
-  Gaussian Ordination.
+Description: Functions used to produce a manuscript on 
+  Unconstrained Gaussian Ordination.
 Imports: vegan, parallel, coenocliner (>= 0.2-0)
 License: GPL-2
