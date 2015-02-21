@@ -43,7 +43,7 @@ returned by \code{BinomGaussPar}.}
 \item{shape}{Random log-uniform range of shape parameters \eqn{alpha}
 and \eqn{gamma} of response function}
 
-\item{range}{Range of beta response in $t$ (\sQuote{sd}) units of
+\item{range}{Range of beta response in \eqn{t} (\sQuote{sd}) units of
 Gaussian response function.}
 
 \item{comm}{Community data.}

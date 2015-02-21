@@ -85,7 +85,7 @@
 #' returned by \code{BinomGaussPar}.
 #' @param shape Random log-uniform range of shape parameters \eqn{alpha}
 #' and \eqn{gamma} of response function
-#' @param range Range of beta response in $t$ (\sQuote{sd}) units of
+#' @param range Range of beta response in \eqn{t} (\sQuote{sd}) units of
 #' Gaussian response function.
 #'
 #' @describeIn coenoclinerutil Translate Gaussian parameters into
