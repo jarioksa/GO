@@ -5,10 +5,13 @@
 \alias{DropMissingSpec}
 \alias{Gauss2betaPar}
 \alias{GradLocs}
+\alias{GradMul}
 \alias{coenorun1}
 \title{Utility Functions for 'coenocliner' Package}
 \usage{
 GradLocs(n, xrange, yrange)
+
+GradMul(xy, xmul, ymul)
 
 BinomGaussPar(nsp, xrange, yrange, buffer = 2, tsd = 0.1)
 
@@ -22,6 +25,10 @@ coenorun1(sim, tot = 1, family = "binomial", far = 4, trace = TRUE)
 \item{n}{Number of SUs.}
 
 \item{xrange,yrange}{Desired range of gradients.}
+
+\item{xy}{Gradient locations in two dimensions.}
+
+\item{xmul,ymul}{Multipliers for each gradient}
 
 \item{nsp}{Number of species.}
 
@@ -61,6 +68,9 @@ package.
 \section{Functions}{
 \itemize{
 \item \code{GradLocs}: Gradient Locations
+
+\item \code{GradMul}: Multiply input gradient which
+presumably is a unit square
 
 \item \code{BinomGaussPar}: Gaussian Parameters for Binomial Response.
 

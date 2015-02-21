@@ -31,7 +31,19 @@
     cbind("x" = runif(n, -xrange/2, xrange/2),
           "y" = runif(n, -yrange/2, yrange/2))
 }
-#' 
+#'
+#' @param xy Gradient locations in two dimensions.
+#' @param xmul,ymul Multipliers for each gradient
+#'
+#' @describeIn coenoclinerutil Multiply input gradient which
+#' presumably is a unit square
+#' @export
+`GradMul` <-
+    function(xy, xmul, ymul)
+{
+   sweep(xy, 2, c(xmul, ymul)) 
+}
+
 #' @param nsp Number of species.
 #' @param buffer Width of buffer zone for optima surrounding ranges.
 #' @param tsd Standard deviation of tolerance in log-Normal
