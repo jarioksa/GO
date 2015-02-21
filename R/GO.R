@@ -60,6 +60,8 @@
 #'
 #' @param parallel Number of parallel processes.
 #'
+#' @param trace logical; print information on the progress of the analysis. 
+#' 
 #' @param \dots Other parameters passed to functions. In \code{GO}
 #' these are passed to \code{\link{nlm}} and can include, e.g.,
 #' \code{iterlim} (which often must be set to higher value than the
@@ -69,7 +71,7 @@
 #' gradient locations in one dimension.
 #' @export
 GO1 <-
-    function(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
+    function(comm, tot = max(comm), freqlim = 5, parallel = 1, trace = TRUE,...)
 {
     comm <- as.data.frame(comm)
     ## do parallel?
@@ -86,8 +88,9 @@ GO1 <-
         warning(
             gettextf("%d SUs were empty and removed after applying 'freqlim'",
                      sum(rs <= 0)))
-    message(gettextf("data has now %d SUs and %d species",
-                     nrow(comm), ncol(comm)))
+    if (trace)
+        message(gettextf("data has now %d SUs and %d species",
+                         nrow(comm), ncol(comm)))
     ## initialize gradient as first DCA axis
     x <- scores(decorana(comm), display = "sites", choices = 1)
     ## loss function with quasibinomial glm
@@ -184,7 +187,8 @@ GO1 <-
 #' @export
 GO <-
     function(comm, k = 1, tot = max(comm), freqlim = 5,
-             family = c("poisson", "binomial"), far = 10, init, ...)
+             family = c("poisson", "binomial"), far = 10, init,
+             trace = TRUE, ...)
 {
     comm <- as.data.frame(comm)
     ## Limit to k <= 4
@@ -198,8 +202,9 @@ GO <-
         warning(
             gettextf("%d SUs were empty and removed after applying 'freqlim'",
                      sum(rs <= 0)))
-    message(gettextf("data has now %d SUs and %d species",
-                     nrow(comm), ncol(comm)))
+    if (trace)
+        message(gettextf("data has now %d SUs and %d species",
+                         nrow(comm), ncol(comm)))
     ## define error family and get corresponding inverse link function
     ## ginv() and deviance function dev()
     family <- match.arg(family)

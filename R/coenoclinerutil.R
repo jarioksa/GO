@@ -140,13 +140,15 @@
 #' @param tot Binomial total in \code{sim}.
 #' @param family Error family passed to \code{\link{GO}}.
 #' @param far Weirdness limit passed to \code{\link{GO}}.
+#' @param trace Print tracing information. If \code{FALSE} or
+#' \code{0}, work as silently as possible, and higher values print more.
 #' @describeIn coenoclinerutil Takes one simulated community for
 #' ordination with GO, NMDS, CA and DCA and returns average Procrustes
 #' precision
 #'
 #' @export
 `coenorun1` <-
-    function(sim, tot=1, family = "binomial", far=4)
+    function(sim, tot=1, family = "binomial", far=4, trace = TRUE)
 {
     locs <- locations(sim)
     n <- nrow(locs)
@@ -154,11 +156,12 @@
     out <- rep(NA, 6)
     names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
     ## GO can fail
-    mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000))
+    mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
+                  trace = trace))
     if (inherits(mgo, "try-error"))
         mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
-                      init = matrix(runif(2*n), ncol=2)))
-    mmds <- metaMDS(sim, maxit=500, trymax=200, sratmax=0.999999, trace=0)
+                      init = matrix(runif(2*n), ncol=2), trace = trace))
+    mmds <- metaMDS(sim, maxit=500, trymax=200, sratmax=0.999999, trace= trace > 1)
     mca <- cca(sim)
     mdca <- decorana(sim)
     if (!inherits(mgo, "try-error"))

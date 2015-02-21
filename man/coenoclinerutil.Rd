@@ -16,7 +16,7 @@ Gauss2betaPar(gausspar, shape = c(0.5, 6.5), range = 5)
 
 DropMissingSpec(comm)
 
-coenorun1(sim, tot = 1, family = "binomial", far = 4)
+coenorun1(sim, tot = 1, family = "binomial", far = 4, trace = TRUE)
 }
 \arguments{
 \item{n}{Number of SUs.}
@@ -48,6 +48,9 @@ Gaussian response function.}
 \item{family}{Error family passed to \code{\link{GO}}.}
 
 \item{far}{Weirdness limit passed to \code{\link{GO}}.}
+
+\item{trace}{Print tracing information. If \code{FALSE} or
+\code{0}, work as silently as possible, and higher values print more.}
 }
 \description{
 Functions to automated simulation routines using \pkg{coenocliner}

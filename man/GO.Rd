@@ -10,10 +10,10 @@
 \alias{spanodev}
 \title{Unconstrained Gaussian Maximum Likelihood Ordination}
 \usage{
-GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, ...)
+GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, trace = TRUE, ...)
 
 GO(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
-  "binomial"), far = 10, init, ...)
+  "binomial"), far = 10, init, trace = TRUE, ...)
 
 \method{plot}{GO}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)
@@ -37,6 +37,8 @@ matrix.}
 \item{freqlim}{Minimum number of occurrence for analysed species.}
 
 \item{parallel}{Number of parallel processes.}
+
+\item{trace}{logical; print information on the progress of the analysis.}
 
 \item{k}{Number of estimated gradients (axes).}
 
