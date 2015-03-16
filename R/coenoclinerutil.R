@@ -41,7 +41,7 @@
 `GradMul` <-
     function(xy, xmul, ymul)
 {
-   sweep(xy, 2, c(xmul, ymul)) 
+   sweep(xy, 2, c(xmul, ymul), "*") 
 }
 
 #' @param nsp Number of species.
