@@ -168,7 +168,7 @@ GO1 <-
 ### correlated). May be tough.
 
 #' @importFrom vegan decorana scores
-#' @importFrom stats quasibinomial quasipoisson gaussian glm
+#' @importFrom stats quasibinomial quasipoisson gaussian glm prcomp
 #' 
 #' @param k Number of estimated gradients (axes).
 #'
@@ -423,7 +423,7 @@ GO <-
     out
 }
 
-#' @importFrom stats stat.anova
+#' @importFrom stats stat.anova deviance df.residual
 
 `anova.GOlist` <-
     function(object, ...)
@@ -487,7 +487,7 @@ GO <-
 ## tolerance = 1 for all species with unimodal responses and then
 ## estimates the glm parameters for normalized SU scores.
 
-#' @importFrom stats coef
+#' @importFrom stats coef glm
 `GOnormalize` <-
     function(comm, x, k, family, w, ...)
 {
