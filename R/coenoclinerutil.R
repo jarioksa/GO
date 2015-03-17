@@ -172,8 +172,13 @@
     function(sim, tot=1, family = "binomial", far=4, trace = TRUE)
 {
     locs <- locations(sim)
-    n <- nrow(locs)
     sim <- DropMissingSpec(sim)
+    empty <- rowSums(sim) <= 0
+    if (any(empty)) {
+        locs <- locs[!empty,]
+        sim <- sim[!empty,]
+    }
+    n <- nrow(locs)
     out <- rep(NA, 6)
     names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
     ## GO can fail
