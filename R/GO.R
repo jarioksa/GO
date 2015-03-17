@@ -199,7 +199,7 @@ GO <-
     comm <- comm[, freq >= freqlim]
     rs <- rowSums(comm)
     if (any(rs <= 0))
-        warning(
+        stop(
             gettextf("%d SUs were empty and removed after applying 'freqlim'",
                      sum(rs <= 0)))
     if (trace)
