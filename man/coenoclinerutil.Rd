@@ -15,7 +15,7 @@ GradMul(xy, xmul, ymul)
 
 BinomGaussPar(nsp, xrange, yrange, buffer = 2, tsd = 0.1)
 
-Gauss2betaPar(gausspar, shape = c(0.5, 6.5), range = 5)
+Gauss2betaPar(gausspar, shape = c(0.5, 6.5), cover = 0.95)
 
 DropMissingSpec(comm)
 
@@ -43,8 +43,9 @@ returned by \code{BinomGaussPar}.}
 \item{shape}{Random log-uniform range of shape parameters \eqn{alpha}
 and \eqn{gamma} of response function}
 
-\item{range}{Range of beta response in \eqn{t} (\sQuote{sd}) units of
-Gaussian response function.}
+\item{cover}{Find range of beta response so that the same span
+covers the same proportion of 1-dim integral as the Gaussian
+response function.}
 
 \item{comm}{Community data.}
 

@@ -81,18 +81,20 @@
          py = cbind("opt" = uy, "tol" = ty))
 }
 
+#' @importFrom stats qbeta qnorm
 #' @param gausspar Gaussian response parameters for species as
 #' returned by \code{BinomGaussPar}.
 #' @param shape Random log-uniform range of shape parameters \eqn{alpha}
 #' and \eqn{gamma} of response function
-#' @param range Range of beta response in \eqn{t} (\sQuote{sd}) units of
-#' Gaussian response function.
+#' @param cover Find range of beta response so that the same span
+#' covers the same proportion of 1-dim integral as the Gaussian
+#' response function.
 #'
 #' @describeIn coenoclinerutil Translate Gaussian parameters into
 #' corresponding beta response parameters.
 #' @export
 `Gauss2betaPar` <-
-    function(gausspar, shape = c(0.5, 6.5), range = 5)
+    function(gausspar, shape = c(0.5, 6.5), cover = 0.95)
 {
     ## Define beta response so that it as similar to a Gaussian model
     ## as possible -- except for shape. Input **must** be similar as
@@ -104,9 +106,14 @@
     gx <- exp(runif(nsp, shape[1], shape[2]))
     ay <- exp(runif(nsp, shape[1], shape[2]))
     gy <- exp(runif(nsp, shape[1], shape[2]))
-    ## ranges a multiple of Gaussian tol
-    rx <- range * gausspar$px[,"tol"]
-    ry <- range * gausspar$py[,"tol"]
+    ## Scale beta response range so that a multiply of 't' covers the
+    ## same integral as Gaussian response: high alpha and gamma give
+    ## narrow responses and must use wider range.
+    lim <- (1 - cover)/2
+    lim <- c(lim, 1-lim)
+    range <- diff(qnorm(lim))
+    rx <- range * gausspar$px[,"tol"] / diff(qbeta(lim, ax+1, gx+1))
+    ry <- range * gausspar$py[,"tol"] / diff(qbeta(lim, ay+1, gy+1))
     ## modal abundance at Gaussian opt
     mx <- gausspar$px[,"opt"]
     my <- gausspar$py[,"opt"]
