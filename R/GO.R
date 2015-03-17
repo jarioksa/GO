@@ -48,6 +48,7 @@
 ## unconstrained Gaussian ordination in one dimension
 
 #' @import parallel
+#' @importFrom stats quasibinomial glm
 #' 
 #' @param comm Community data frame.
 #'
@@ -166,7 +167,8 @@ GO1 <-
 ### the species optima and the Gaussian axis really are are
 ### correlated). May be tough.
 
-#' @importFrom vegan decorana
+#' @importFrom vegan decorana scores
+#' @importFrom stats quasibinomial quasipoisson gaussian glm
 #' 
 #' @param k Number of estimated gradients (axes).
 #'
@@ -317,6 +319,7 @@ GO <-
 }
 
 #' @importFrom vegan pasteCall
+#' @importFrom stats printCoefmat
 #' 
 #' @export
 `print.GO` <-
@@ -345,6 +348,7 @@ GO <-
 }
 
 #' @importFrom vegan ordilabel scores
+#' @importFrom graphics matplot
 #' 
 #' @param x Fitted model.
 #'
@@ -387,6 +391,7 @@ GO <-
 
 ## Basic anova against Null model of constant response
 
+#' @importFrom stats pf
 #' @param object Ordination result object.
 #'
 #' @rdname GO
@@ -418,6 +423,8 @@ GO <-
     out
 }
 
+#' @importFrom stats stat.anova
+
 `anova.GOlist` <-
     function(object, ...)
 {
@@ -440,6 +447,7 @@ GO <-
 
 ## spdev functions analyse each species separately with F-test
 
+#' @importFrom stats df.residual pf
 #' @param mod1,mod2 Compared result objects
 #'
 #' @describeIn GO Comparison of goodness of fit for individual species.
@@ -478,6 +486,8 @@ GO <-
 ## Function normalizes SU scores so that (unweighted) average
 ## tolerance = 1 for all species with unimodal responses and then
 ## estimates the glm parameters for normalized SU scores.
+
+#' @importFrom stats coef
 `GOnormalize` <-
     function(comm, x, k, family, w, ...)
 {
@@ -544,6 +554,7 @@ GO <-
 ### and the fitted GO model.
 
 #' @importFrom vegan calibrate wascores
+#' @importFrom stats predict
 #' 
 #' @rdname GO
 #' @export

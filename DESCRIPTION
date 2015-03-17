@@ -6,5 +6,5 @@ Authors@R: person(given = "Jari", family = "Oksanen",
                   email = "jhoksane@gmail.com")
 Description: Functions used to produce a manuscript on 
   Unconstrained Gaussian Ordination.
-Imports: vegan, parallel, coenocliner (>= 0.2-0)
+Imports: vegan, parallel, coenocliner (>= 0.2-0), stats, graphics
 License: GPL-2
