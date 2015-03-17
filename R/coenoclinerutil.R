@@ -155,7 +155,7 @@
     comm
 }
 
-#' @importFrom vegan metaMDS cca decorana procrustes specnumber
+#' @importFrom vegan metaMDS cca decorana procrustes specnumber wisconsin
 #' @importFrom coenocliner locations
 #' @param sim One simulated community.
 #' @param tot Binomial total in \code{sim}.
