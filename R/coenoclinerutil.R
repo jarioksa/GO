@@ -112,8 +112,10 @@
     lim <- (1 - cover)/2
     lim <- c(lim, 1-lim)
     range <- diff(qnorm(lim))
-    rx <- range * gausspar$px[,"tol"] / diff(qbeta(lim, ax+1, gx+1))
-    ry <- range * gausspar$py[,"tol"] / diff(qbeta(lim, ay+1, gy+1))
+    rx <- range * gausspar$px[,"tol"] /
+        (qbeta(lim[2], ax+1, gx+1) - qbeta(lim[1], ax+1, gx+1))
+    ry <- range * gausspar$py[,"tol"] /
+        (qbeta(lim[2], ay+1, gy+1) - qbeta(lim[1], ay+1, gy+1))
     ## modal abundance at Gaussian opt
     mx <- gausspar$px[,"opt"]
     my <- gausspar$py[,"opt"]
