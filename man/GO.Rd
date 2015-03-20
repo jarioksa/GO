@@ -5,6 +5,7 @@
 \alias{GO1}
 \alias{anova.GO}
 \alias{calibrate.GO}
+\alias{metaGO}
 \alias{plot.GO}
 \alias{predict.GO}
 \alias{spanodev}
@@ -14,6 +15,8 @@ GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, trace = TRUE, ...)
 
 GO(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
   "binomial"), far = 10, init, trace = TRUE, ...)
+
+metaGO(comm, k = 1, trymax = 3, firstOK = TRUE, ...)
 
 \method{plot}{GO}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)
@@ -53,6 +56,10 @@ alien and frozen in fitting.}
 should be a matrix, and number of rows should match the community
 data, and number coluns the number of gradients (\code{k}). The
 default is to use scores from \code{\link[vegan]{decorana}}.}
+
+\item{trymax}{Maximum number of random starts.}
+
+\item{firstOK}{Do not launch random starts if default start succeeds.}
 
 \item{x}{Fitted model.}
 
@@ -119,6 +126,9 @@ gradient locations in one dimension.
 
 \item \code{GO}: Simultaneous estimation of species parameters and
 gradient locations.
+
+\item \code{metaGO}: Start GO several times from random configurations if
+default start fails or optionally always
 
 \item \code{spanodev}: Comparison of goodness of fit for individual species.
 }}

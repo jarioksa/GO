@@ -318,6 +318,84 @@ GO <-
     out
 }
 
+#' @importFrom vegan procrustes
+#' 
+#' @param trymax Maximum number of random starts.
+#' @param firstOK Do not launch random starts if default start succeeds.
+#' 
+#' @describeIn GO Start GO several times from random configurations if
+#' default start fails or optionally always
+#'
+#' @export 
+`metaGO`  <-
+    function(comm, k = 1, trymax = 3, firstOK = TRUE, ...)
+{
+    EPS <- 1e-4
+    out <- try(GO(comm, k = k, ...))
+    if (!inherits(out, "try-error") && firstOK)
+        return(out)
+    else {
+        tries <- 0
+        converged <- FALSE
+        N <- nrow(comm)
+        while (tries < trymax && !converged) {
+            out0 <- try(GO(comm, k = k, init = matrix(runif(k*N), ncol=k), ...))
+            if (!inherits(out0, "try-error")) {
+                if (!inherits(out, "try-error")) {
+                    ss <- procrustes(out, out0, symmetric=TRUE)$ss
+                    print(c(deviance(out0) - deviance(out), ss))
+                    if (ss < EPS)
+                        converged <- TRUE
+                }
+                if (inherits(out, "try-error") ||
+                    deviance(out0) < deviance(out))
+                    out <- out0
+            }
+            tries <- tries + 1
+        }
+    }
+    if (inherits(out, "try-error"))
+        stop("failed after ", tries, " tries")
+    out$call <- match.call()
+    out$tries <- tries
+    out$converged <- converged
+    out
+}
+`metaGO`  <-
+    function(comm, k = 1, trymax = 3, firstOK = TRUE, ...)
+{
+    EPS <- 1e-4
+    out <- try(GO(comm, k = k, ...))
+    if (!inherits(out, "try-error") && firstOK)
+        return(out)
+    else {
+        tries <- 0
+        converged <- FALSE
+        N <- nrow(comm)
+        while (tries < trymax && !converged) {
+            out0 <- try(GO(comm, k = k, init = matrix(runif(k*N), ncol=k), ...))
+            if (!inherits(out0, "try-error")) {
+                if (!inherits(out, "try-error")) {
+                    ss <- procrustes(out, out0, symmetric=TRUE)$ss
+                    print(c(deviance(out0) - deviance(out), ss))
+                    if (ss < EPS)
+                        converged <- TRUE
+                }
+                if (inherits(out, "try-error") ||
+                    deviance(out0) < deviance(out))
+                    out <- out0
+            }
+            tries <- tries + 1
+        }
+    }
+    if (inherits(out, "try-error"))
+        stop("failed after ", tries, " tries")
+    out$call <- match.call()
+    out$tries <- tries
+    out$converged <- converged
+    out
+}
+
 #' @importFrom vegan pasteCall
 #' @importFrom stats printCoefmat
 #' 
