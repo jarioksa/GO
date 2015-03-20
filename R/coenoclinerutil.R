@@ -181,12 +181,9 @@
     n <- nrow(locs)
     out <- rep(NA, 6)
     names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
-    ## GO can fail
-    mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
+    ## GO can fail -- even metaGO
+    mgo <- try(metaGO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
                   trace = trace))
-    if (inherits(mgo, "try-error"))
-        mgo <- try(GO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
-                      init = matrix(runif(2*n), ncol=2), trace = trace))
     mmds <- metaMDS(sim, maxit=500, trymax=200, sratmax=0.999999, trace= trace > 1)
     mca <- cca(sim)
     mdca <- decorana(sim)
