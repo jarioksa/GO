@@ -377,7 +377,6 @@ GO <-
             if (!inherits(out0, "try-error")) {
                 if (!inherits(out, "try-error")) {
                     ss <- procrustes(out, out0, symmetric=TRUE)$ss
-                    print(c(deviance(out0) - deviance(out), ss))
                     if (ss < EPS)
                         converged <- TRUE
                 }
