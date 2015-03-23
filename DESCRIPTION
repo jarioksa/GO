@@ -1,6 +1,6 @@
 Package: GO
 Title: Gaussian Ordination and Community Simulation
-Version: 0.3-0
+Version: 0.4-0
 Authors@R: person(given = "Jari", family = "Oksanen",
                   role = c("cre","aut"),
                   email = "jhoksane@gmail.com")
