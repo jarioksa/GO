@@ -328,7 +328,7 @@ GO <-
 #'
 #' @export 
 `metaGO`  <-
-    function(comm, k = 1, trymax = 3, firstOK = TRUE, ...)
+    function(comm, k = 1, trymax = 3, firstOK = TRUE, trace = FALSE, ...)
 {
     EPS <- 1e-4
     out <- try(GO(comm, k = k, ...))
@@ -339,41 +339,8 @@ GO <-
         converged <- FALSE
         N <- nrow(comm)
         while (tries < trymax && !converged) {
-            out0 <- try(GO(comm, k = k, init = matrix(runif(k*N), ncol=k), ...))
-            if (!inherits(out0, "try-error")) {
-                if (!inherits(out, "try-error")) {
-                    ss <- procrustes(out, out0, symmetric=TRUE)$ss
-                    print(c(deviance(out0) - deviance(out), ss))
-                    if (ss < EPS)
-                        converged <- TRUE
-                }
-                if (inherits(out, "try-error") ||
-                    deviance(out0) < deviance(out))
-                    out <- out0
-            }
-            tries <- tries + 1
-        }
-    }
-    if (inherits(out, "try-error"))
-        stop("failed after ", tries, " tries")
-    out$call <- match.call()
-    out$tries <- tries
-    out$converged <- converged
-    out
-}
-`metaGO`  <-
-    function(comm, k = 1, trymax = 3, firstOK = TRUE, ...)
-{
-    EPS <- 1e-4
-    out <- try(GO(comm, k = k, ...))
-    if (!inherits(out, "try-error") && firstOK)
-        return(out)
-    else {
-        tries <- 0
-        converged <- FALSE
-        N <- nrow(comm)
-        while (tries < trymax && !converged) {
-            out0 <- try(GO(comm, k = k, init = matrix(runif(k*N), ncol=k), ...))
+            out0 <- try(GO(comm, k = k, init = matrix(runif(k*N), ncol=k),
+                           trace = FALSE, ...))
             if (!inherits(out0, "try-error")) {
                 if (!inherits(out, "try-error")) {
                     ss <- procrustes(out, out0, symmetric=TRUE)$ss
@@ -381,12 +348,19 @@ GO <-
                         converged <- TRUE
                 }
                 if (inherits(out, "try-error") ||
-                    deviance(out0) < deviance(out))
+                    deviance(out0) < deviance(out)) {
                     out <- out0
+                    if (trace)
+                        cat("improved ")
+                }
+                if (trace)
+                    cat(round(deviance(out0)), "\n")
             }
             tries <- tries + 1
         }
     }
+    if (trace && converged)
+        cat("converged\n")
     if (inherits(out, "try-error"))
         stop("failed after ", tries, " tries")
     out$call <- match.call()

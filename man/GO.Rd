@@ -16,7 +16,7 @@ GO1(comm, tot = max(comm), freqlim = 5, parallel = 1, trace = TRUE, ...)
 GO(comm, k = 1, tot = max(comm), freqlim = 5, family = c("poisson",
   "binomial"), far = 10, init, trace = TRUE, ...)
 
-metaGO(comm, k = 1, trymax = 3, firstOK = TRUE, ...)
+metaGO(comm, k = 1, trymax = 3, firstOK = TRUE, trace = FALSE, ...)
 
 \method{plot}{GO}(x, choices = 1, label = FALSE, marginal = FALSE,
   cex = 0.7, col = 1:6, ...)
