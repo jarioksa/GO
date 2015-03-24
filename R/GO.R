@@ -332,6 +332,8 @@ GO <-
 {
     EPS <- 1e-4
     out <- try(GO(comm, k = k, ...))
+    if (trace && !inherits(out, "try-error"))
+        cat("start", round(deviance(out)), "\n")
     if (!inherits(out, "try-error") && firstOK)
         return(out)
     else {
