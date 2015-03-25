@@ -181,9 +181,10 @@
     n <- nrow(locs)
     out <- rep(NA, 6)
     names(out) <- c("GO", "NMDS", "CA", "DCA", "gamma", "alpha")
-    ## GO can fail -- even metaGO
+    ## GO can fail -- even metaGO. Hardcode metaGO options to protect
+    ## this routine against possible changes in metaGO.
     mgo <- try(metaGO(sim, k=2, family=family, tot=tot, far=far, iterlim=1000,
-                  trace = trace))
+                  trace = trace, firstOK=TRUE, trymax=3))
     mmds <- metaMDS(sim, maxit=500, trymax=200, sratmax=0.999999, trace= trace > 1)
     mca <- cca(sim)
     mdca <- decorana(sim)
