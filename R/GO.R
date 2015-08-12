@@ -48,7 +48,7 @@
 ## unconstrained Gaussian ordination in one dimension
 
 #' @import parallel
-#' @importFrom stats quasibinomial glm
+#' @importFrom stats quasibinomial glm nlm fitted
 #' 
 #' @param comm Community data frame.
 #'
@@ -168,7 +168,7 @@ GO1 <-
 ### correlated). May be tough.
 
 #' @importFrom vegan decorana scores
-#' @importFrom stats quasibinomial quasipoisson gaussian glm prcomp
+#' @importFrom stats quasibinomial quasipoisson gaussian glm prcomp nlm
 #' 
 #' @param k Number of estimated gradients (axes).
 #'
@@ -319,6 +319,7 @@ GO <-
 }
 
 #' @importFrom vegan procrustes
+#' @importFrom stats runif
 #' 
 #' @param trymax Maximum number of random starts.
 #' @param firstOK Do not launch random starts if default start succeeds.
@@ -401,7 +402,7 @@ GO <-
 }
 
 #' @importFrom vegan ordilabel scores
-#' @importFrom graphics matplot
+#' @importFrom graphics matplot rug
 #' 
 #' @param x Fitted model.
 #'

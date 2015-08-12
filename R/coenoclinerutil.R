@@ -23,6 +23,8 @@
 #' @param n Number of SUs.
 #' @param xrange,yrange Desired range of gradients.
 #'
+#' @importFrom stats runif
+#' 
 #' @describeIn coenoclinerutil Gradient Locations
 #' @export
 `GradLocs` <-
@@ -48,6 +50,8 @@
 #' @param buffer Width of buffer zone for optima surrounding ranges.
 #' @param tsd Standard deviation of tolerance in log-Normal
 #' distribution, in log scale
+#'
+#' @importFrom stats runif rlnorm
 #'
 #' @describeIn coenoclinerutil Gaussian Parameters for Binomial Response.
 #' @export
@@ -81,7 +85,7 @@
          py = cbind("opt" = uy, "tol" = ty))
 }
 
-#' @importFrom stats qbeta qnorm
+#' @importFrom stats qbeta qnorm runif
 #' @param gausspar Gaussian response parameters for species as
 #' returned by \code{BinomGaussPar}.
 #' @param shape Random log-uniform range of shape parameters \eqn{alpha}
