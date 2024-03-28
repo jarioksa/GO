@@ -7,7 +7,6 @@ Authors@R: person(given = "Jari", family = "Oksanen",
 Description: Functions used to produce a manuscript on 
   Unconstrained Gaussian Ordination.
 Imports: vegan, parallel, coenocliner (>= 0.2-0), stats, graphics
-Suggests: knitr
-VignetteBuilder: utils, knitr
+SystemRequirements: tikz
 Encoding: UTF-8
 License: GPL-2
