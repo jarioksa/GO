@@ -2,11 +2,12 @@
 \documentclass[a4paper,10pt]{article}
 
 \usepackage{vegan} % vegan settings
+\usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{tikz} % used for Gaussian response pic
 \newcommand{\E}{\mathrm{e}} % used in the previous tikz pic
 
-\title{Gaussian Ordination} 
+\title{Gaussian Ordination}
 \author{Jari Oksanen}
 
 \begin{document}
@@ -83,7 +84,7 @@ that $c < 0$):
   g(h) &= a -\frac{b^2}{4c} = a + 0.5 b^2 t^2\, .
 \end{align}
 
-If we scale $x$ ``in sd units'' so that $t = 1$ (and hence $c=-0.5$), 
+If we scale $x$ ``in sd units'' so that $t = 1$ (and hence $c=-0.5$),
 eq.~(\ref{eq:gpoly}) becomes
 \begin{equation}
   \label{eq:gpolyfix}
@@ -103,7 +104,7 @@ values $x_i$ as known, and estimate the species parameters so that
 fitted values $\mu_i$ are as similar to observed values $y_i$ as
 possible. In Maximum Likelihood estimation the fitted species
 parameters are estimated to maximize the likelihood of fitted values
-$\mu_i$ given data $y_i$ and $x_i$.  In Gaussian Ordination we 
+$\mu_i$ given data $y_i$ and $x_i$.  In Gaussian Ordination we
 select $x_i$ and species parameters so that fitted values $\mu_i$ will
 maximize the likelihood function given data $y_i$ (and the model).
 
@@ -128,9 +129,9 @@ Equation~(\ref{eq:GO}) can be solved with non-linear minization of
 log-likelihood or deviance function. With a $n \times m$ data matrix
 and $k$ ordination dimensions, there are $m$ parameters $a$, $km$
 parameters $b$ and $kn$ parameters $x$ or altogether $m + k(m+n)$
-parameters which can be a large number. 
+parameters which can be a large number.
 
-There are two obvious alternative ways of estimating the model: 
+There are two obvious alternative ways of estimating the model:
 \begin{enumerate}
 \item Only ordination dimensions $x$ are found by non-linear
   minimization, and the species parameters $a$ and $b$ are found
@@ -143,7 +144,7 @@ There are two obvious alternative ways of estimating the model:
   $x$ and prevent changing $x$. This is apparent as stopping because
   steplength is too short. Analysis of a $24 \times 28$ data set used
   below took nearly 400\,sec in a 1.6\,GHz laptop, but used only 23
-  iterations. 
+  iterations.
 \item All parameters are found simultaneously with non-linear
   minization. The most obvious disadvantage is that the non-linear
   minimization problem can be huge. However, the same data set as
@@ -152,7 +153,7 @@ There are two obvious alternative ways of estimating the model:
   common species in 398 SUs of the Mt.\,Field vegetation data whick in
   2 dimensions gave $127 + 2 \times (127 + 398) = 1177$ estimated
   parameters, and it took days to run this analysis in a 1.6\,GHz
-  laptop. 
+  laptop.
 \end{enumerate}
 I have implemented both alternatives although the main development
 branch is based on the second alternative, and this paper only uses
@@ -175,7 +176,7 @@ there will be other alternatives and this will be made a user
 choice. The Binomial model uses logit link function so that the models
 are not strictly Gaussian. Other error models to be inspected are
 quasi-Poisson and Normal (Gaussian distribution), both with $\log$
-link. 
+link.
 
 For effective evaluation, we need derivatives of the likelihood with
 respect to the parameters. If these are not supplied, numerical
@@ -223,7 +224,7 @@ be evaluated with $F$ statistic
 \end{equation}
 A null model with no gradients ($k=0$) will only estimate $m$
 coefficients for the average of each species, and can be used as a
-baseline of model comparison. 
+baseline of model comparison.
 
 Please note that the following does not define a meanigfully testable
 model:
@@ -283,7 +284,7 @@ these examples and data sets and functions from \pkg{vegan} package.
 <<>>=
 library(GO)
 library(vegan)
-@ 
+@
 The file \code{GO.R} contains main functions for analysis plus some
 support functions. All these are under work, and they will change, in
 particular in their internals, and even the user-interface is not yet
@@ -293,7 +294,7 @@ GLM estimation of species parameters $a, b$. The user interfaces are:
 <<>>=
 args(GO1)
 args(GO)
-@ 
+@
 Both of these functions share some arguments:
 \begin{itemize}
   \item \code{comm}: The community data frame.
@@ -301,7 +302,7 @@ Both of these functions share some arguments:
   \item \code{freqlim}: Frequency (number of occurrences) of rarest
     species to be analysed. $k + 1$ parameters are fitted for
     each species, and therefore we need some minimal data for
-    estimation. 
+    estimation.
 \end{itemize}
 Function \code{GO1} is so far implemented only for one
 dimension. Because it uses the alternating non-linear and GLM fitting,
@@ -313,7 +314,7 @@ no particularly compelling reason to impose this limit\,--\,I only
 assume that things get hairier as the number of axes increases. In
 addition, we can pass arguments to the minimizing function \code{nlm}
 in these functions, and we shall set higher iteration limits with
-\code{iterlim}. 
+\code{iterlim}.
 
 \code{GO1} is currently only available for one dimension, and it is
 very slow, and therefore we use only \code{GO}. Let us first evaluate
@@ -323,11 +324,11 @@ data(varespec)
 system.time(m1 <- GO(varespec, k=1, freqlim=10, tot=100, iterlim=1000))
 system.time(m2 <- GO(varespec, k=2, freqlim=10, tot=100, iterlim=1000))
 system.time(m3 <- GO(varespec, k=3, freqlim=10, tot=100, iterlim=1000))
-@ 
+@
 I have written some method functions that can be used with the result:
 <<>>=
 methods(class="GO")
-@ 
+@
 For instance, there is a \code{print} method so that we get a brief
 overview of the result (and typing the name of the object implicitly
 calls \code{print}):
@@ -335,7 +336,7 @@ calls \code{print}):
 m1
 m2
 m3
-@ 
+@
 The \code{print} gives a brief overview of the result object, e.g.,
 the astonishingly high proportions of deviance explained by each
 ordination.  In fact, the result object contains a large number of
@@ -343,7 +344,7 @@ components which are not displayed, but can be used by other
 functions:
 <<>>=
 names(m2)
-@ 
+@
 The main results are SU scores (\code{points}, $x_{ik}$) and species scores
 (\code{species}, $b_{jk}$ which give the optima; the constants $a_j$
 are saved in item \code{b0}). The result object was constructed so that
@@ -352,7 +353,7 @@ several standard \R{} functions can extract the results. Moreover,
 and many standard \pkg{vegan} functions can handle the result and we
 do not need to write new functions or interfaces; some examples we
 will see here are functions are \code{ordiplot}, \code{enfvit},
-\code{ordisurf}, \code{procrustes}. 
+\code{ordisurf}, \code{procrustes}.
 
 I have made a specific \code{plot} function that displays the
 responses against gradients (Fig.~\ref{fig:plotm1}).
@@ -368,18 +369,18 @@ responses against gradients (Fig.~\ref{fig:plotm1}).
 \end{figure}
 <<plot-GO,fig=TRUE,include=FALSE>>=
 plot(m1, label = TRUE)
-@ 
+@
 For multi-axis models this will display a line through origin with
 other gradients set to zero. It can optionally show the marginal model where
 the height of the curve would be the same on all gradients, but the
-default is a gradient line through the origin. 
+default is a gradient line through the origin.
 
 For a classical ordination plot, we can use \pkg{vegan}
 \code{ordiplot} function that is able to handle \code{GO} results
 (Fig.~\ref{fig:plotm1}).
 <<ordiplot-stack,fig=TRUE,include=FALSE>>=
 ordiplot(m1)
-@ 
+@
 Function \code{ordiplot} displays one-axis results with a
 \pkg{vegan} \code{linestack} function. With more axes, the default is
 to show ordination plots of both species and sites (Fig.~\ref{fig:plotm2})
@@ -393,7 +394,7 @@ to show ordination plots of both species and sites (Fig.~\ref{fig:plotm2})
 \end{figure}
 <<ordiplot-m2a,fig=TRUE,include=FALSE>>=
 ordiplot(m2, type="t")
-@ 
+@
 <<ordiplot-m2b,fig=TRUE,include=FALSE>>=
 ordiplot(m2, display="si")
 @
@@ -403,7 +404,7 @@ cannot add new dimensions to  existing solutions, but ordination for
 each dimensionality must be found separately. In this respect GO and
 NMDS are similar. We can see this by fitting surface of
 one-dimensional solution onto two-dimensional solution
-(Fig.~\ref{fig:go-subspace}). 
+(Fig.~\ref{fig:go-subspace}).
 \begin{figure}
   \centering
   \includegraphics[width=0.6\linewidth]{GO-go-subspace}
@@ -416,7 +417,7 @@ one-dimensional solution onto two-dimensional solution
 <<go-subspace,fig=TRUE,include=FALSE>>=
 ordisurf(m2 ~ scores(m1), bubble=3)
 plot(envfit(m2 ~ scores(m1)), label="Dim1")
-@ 
+@
 As you see, \pkg{vegan} functions \code{ordisurf}, \code{envfit}
 and \code{scores} are can handle \code{GO} results.
 
@@ -436,7 +437,7 @@ ord <- decorana(v10)
 p1 <- procrustes(m2, ord, choices = 1:2)
 p1
 plot(p1, to.target = FALSE, main="")
-@ 
+@
 \begin{figure}
   \centering
   \subfigure[DCA]{\includegraphics[width=0.5\textwidth]{GO-proc-dca}}%
@@ -455,7 +456,7 @@ nm <- metaMDS(v10, autotransform = FALSE, trace = FALSE)
 p2 <- procrustes(m2, nm)
 p2
 plot(p2, to.target=FALSE, main="")
-@ 
+@
 The goodness of fit is measured in the units of the target, and the
 analyses are comparable. NMDS is clearly much more similar to GO than
 DCA, although DCA was used as the starting configuration in GO.
@@ -467,7 +468,7 @@ $t=1$. This does not mean that such responses really are the best ones
 for the gradient. In the following we fit similar second degree
 polynomials to all species without restricting the second degree
 coefficient, and plot the results over the canonical fit
-(Fig.~\ref{fig:freefit}): 
+(Fig.~\ref{fig:freefit}):
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{GO-freefit}
@@ -482,24 +483,24 @@ v10 <- varespec[, colSums(varespec>0) >= 10]
 ## the gradient
 ax <- drop(scores(m1))
 ## fit free quadratic quasibinomial GLMs
-mods <- lapply(v10, function(y) glm(cbind(y, 100-y) ~ ax + I(ax^2), 
+mods <- lapply(v10, function(y) glm(cbind(y, 100-y) ~ ax + I(ax^2),
                                     family=quasibinomial))
 ## predict values
 predx <- seq(min(ax), max(ax), len=101)
-fits <- sapply(mods, function(z) predict(z, type="response", 
+fits <- sapply(mods, function(z) predict(z, type="response",
                                          newdata=data.frame(ax=predx)))
 ## plot
 plot(m1)
 matlines(predx, fits, lty=3)
 legend("topright", c("Fit with t=1", "Fit with free t"), lty=c(1,3), col=3)
-@ 
+@
 The widths of Gaussian responses differ from $t=1$ although this was
 imposed in fitting:
 <<>>=
 b <- sapply(mods, coef)
 rownames(b)
 sqrt(-1/2/b[3,])
-@ 
+@
 The \code{NaN} cases had quadratic coefficient\;$>0$ which define a
 non-unimodal response. Surprisingly, even \code{Cla.ste} is among
 those non-unimodal species, although chapter~\ref{sec:contributions}
@@ -521,7 +522,7 @@ scl <- deviance(m1)/dfr
 f <- (deviance(m1) - devalt)/dff/scl
 f
 pf(f, dff, dfr, lower.tail = FALSE)
-@ 
+@
 
 
 
@@ -533,13 +534,13 @@ perform all typical tests. I have packed basic ANOVA as a separate
 function. An overall test of the fitted model is
 <<>>=
 anova(m2)
-@ 
+@
 The significances are very high (that is, $P$-values are low).  The
 degrees of freedom take into account that the gradient also is
 estimated, but the tests still are biased. We have selected $x$ to
 minimize residual deviance and maximize $F$ statistics. I do not know
 yet how to develop more correct tests. Simple permutation is out of
-question due to slow calculation times. 
+question due to slow calculation times.
 
 The above tests gave the overall statistic for the whole
 multidimensional model. The packaged \code{anova} function allows
@@ -549,17 +550,17 @@ axis to a one-axis model. Let us first see the significance of
 one-dimensional ordination:
 <<>>=
 anova(m1)
-@ 
+@
 Then we can see how adding dimensions improves the results:
 <<>>=
 anova(m1, m2, m3)
-@ 
+@
 
 \subsection{Contributions by species}
 \label{sec:contributions}
 
 This chapter is for those who complain that ordination tells us
-nothing about species. 
+nothing about species.
 
 The deviance of the model is the sum of deviances of individual
 species. This test is even more approximate than previous since we
@@ -581,7 +582,7 @@ against each other.
 Let us see first how one dimension ``explains'' each species:
 <<>>=
 spanodev(m1)
-@ 
+@
 %\begin{figure}
 %  \centering
 %  \includegraphics[width=0.7\linewidth]{DSCN1123.jpg}
@@ -592,7 +593,7 @@ It is remarkable how unevenly species contribute to the model fit, and
 some species are actually more poorly explained by the model than the
 Null of constant abundance. One single species (\code{Cla.ste},
 \emph{Cladina stellaris})
-%, Fig.~\ref{fig:Claste}) 
+%, Fig.~\ref{fig:Claste})
 contributes more than
 half of the modelled deviance.  The situation is similar as in
 non-scaled PCA where species with large variance are the only worth
@@ -606,10 +607,10 @@ fails if it picks up this species.
 Then we can see how adding second axis improves fits for each species:
 <<>>=
 spanodev(m1, m2)
-@ 
+@
 Adding second axis picks up new important species. The explanation for
 \emph{Cladina stellaris} does not improve: all was explained in the
-first axis. 
+first axis.
 
 \subsection{Failures}
 
@@ -637,10 +638,10 @@ data(dune)
 mdu1 <- GO(dune, k=1, iterlim=1000)
 mdu1
 plot(mdu1, label=TRUE)
-@ 
+@
 <<dune-ordi,fig=TRUE,include=FALSE>>=
 ordiplot(mdu1)
-@ 
+@
 The analysis did not converge, and the results are surprising
 (Fig.~\ref{fig:dune}). SUs are polarized in two groups very far away
 from each other.  It seems that GO
@@ -669,7 +670,7 @@ robust, but should ML GO be robust? Isn't it Maximum Likelihood? Isn't
 it Gaussian? If data are not such, no ML GO should work\dots However,
 there is another case which seems to fail, and this is more
 problematic since here the method should have worked: GO of
-Mt.\,Field. 
+Mt.\,Field.
 
 I intended to send you brief overview of my experiments last Sunday,
 but then light mindedly decided to also run a GO on the full
